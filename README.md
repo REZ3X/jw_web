@@ -1,36 +1,92 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# JogjaWaskita Frontend
 
-## Getting Started
+This is the official Next.js frontend application for **JogjaWaskita**, a civic engagement platform designed for citizens to report, track, and resolve local issues in collaboration with government departments.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🚀 Features
+
+The JogjaWaskita frontend is packed with modern features tailored for citizens, government officials, and platform administrators:
+
+- **🔐 Secure Authentication:** Seamless Google OAuth login. Authentication relies on HttpOnly cookies via a secure BFF architecture.
+- **📰 Centralized Feed:** A social media style community feed featuring infinite scroll, interactive vote actions, nested comments, and advanced filtering options.
+- **📸 Media & Reporting:** Users can upload up to 4 images per report, optionally specify locations, and rely on an AI-powered "Choose for me" button to automatically classify report departments.
+- **🤖 Dedicated AI Chat:** ChatGPT-style interface allowing users to converse with the JogjaWaskita AI Assistant. Supports general inquiries or complex agentic tool operations.
+- **🏛️ Government Dashboard:** Dedicated workspace for official departments to track, update, and manage the issue queue (Pending, In Progress, Resolved).
+- **🛡️ Dev Admin Panel:** High-level platform analytics, detailed user management, role assignments, and a system log viewer for auditing.
+- **🎨 Modern Design:** Vibrant UI utilizing TailwindCSS v4. Complete with glassmorphism effects, dynamic micro-animations, and full dark-mode support.
+
+---
+
+## 🏗️ Architecture
+
+This repository strictly implements a **BFF (Backend-For-Frontend)** architectural pattern. 
+
+### Why BFF?
+- **Security:** The browser never speaks directly to the Rust backend APIs. All client-side requests go through Next.js API Route Handlers (`src/app/api/...`) which act as a secure proxy.
+- **Stateless Tokens:** Access tokens are managed entirely through `HttpOnly` server cookies. Client-side code never stores or directly accesses sensitive JWT tokens, mitigating XSS risks.
+- **Server Confidence:** Next.js Server Components securely communicate directly with the Rust APIs during SSR (Server-Side Rendering) for optimal performance.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework:** Next.js 16 (App Router) & React 19
+- **Styling:** Tailwind CSS v4, utilizing a standardized variables-based design system
+- **State Management:** Zustand (for lightweight global Auth-state)
+- **Icons:** Lucide React
+- **Date Formatting:** date-fns
+- **Markdown:** react-markdown & remark-gfm (to render AI agent responses)
+
+---
+
+## 📂 Project Structure
+
+```text
+jw_web/
+├── src/
+│   ├── app/                # Next.js App Router (Pages, Layouts, API Routes)
+│   │   ├── admin/          # Dev Admin panel and log viewers
+│   │   ├── api/            # BFF Proxy Handlers (auth, posts, comments, chat, analytics)
+│   │   ├── auth/           # Login and OAuth callbacks
+│   │   ├── chat/           # AI conversational interfaces
+│   │   ├── dashboard/      # Specific government task queues
+│   │   ├── explore/        # Advanced global search
+│   │   └── profile/        # User accounts and settings
+│   ├── components/         # Reusable UI, Layouts, and domain-specific Components
+│   └── lib/                # Shared utilities, constants, API fetch wrappers, Auth
+├── public/                 # Static assets
+└── .env.example            # Environment properties template
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## ⚙️ Getting Started
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Prerequisites
+- Node.js (`v18.x` or later recommended)
+- The [JogjaWaskita Rust Backend](../jw_api) must be running.
 
-## Learn More
+### 1. Installation
+Clone the repository and install dependencies:
+```bash
+cd jw_web
+npm install
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 2. Environment Configuration
+Copy the supplied environment template to ensure everything binds properly:
+```bash
+cp .env.example .env
+```
+Ensure that `BACKEND_URL` in the `.env` points to your backend instance. If running locally, this generally looks like:
+```env
+BACKEND_URL=http://localhost:8000
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 3. Start Development Server
+Start hacking locally:
+```bash
+npm run dev
+```
+Navigate to [http://localhost:3000](http://localhost:3000) in your browser.
