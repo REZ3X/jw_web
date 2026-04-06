@@ -7,13 +7,14 @@
  * GET /api/auth/google/callback?code=XXX
  */
 import { BACKEND } from "@/lib/api";
+import { NextResponse } from "next/server";
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
 
   if (!code) {
-    return Response.redirect(new URL("/auth/login?error=missing_code", request.url));
+    return NextResponse.redirect(new URL("/auth/login?error=missing_code", request.url));
   }
 
   try {
@@ -25,7 +26,7 @@ export async function GET(request) {
     const data = await res.json().catch(() => ({}));
 
     if (!res.ok || !data?.data?.token) {
-      return Response.redirect(new URL("/auth/login?error=auth_failed", request.url));
+      return NextResponse.redirect(new URL("/auth/login?error=auth_failed", request.url));
     }
 
 
@@ -33,18 +34,20 @@ export async function GET(request) {
     const isNew = data.data.is_new_user;
     const redirectUrl = new URL(isNew ? "/?welcome=true" : "/", request.url);
 
-    const response = Response.redirect(redirectUrl);
-
+    const response = NextResponse.redirect(redirectUrl);
 
     const isProd = process.env.NODE_ENV === "production";
-    response.headers.set(
-      "Set-Cookie",
-      `jw_token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${60 * 60 * 24 * 7}${isProd ? "; Secure" : ""}`
-    );
+    response.cookies.set("jw_token", token, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7,
+      secure: isProd
+    });
 
     return response;
   } catch (err) {
     console.error("OAuth callback error:", err);
-    return Response.redirect(new URL("/auth/login?error=server_error", request.url));
+    return NextResponse.redirect(new URL("/auth/login?error=server_error", request.url));
   }
 }

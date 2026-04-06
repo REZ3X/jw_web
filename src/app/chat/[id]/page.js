@@ -33,7 +33,7 @@ export default function ChatConversation() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user || !id) return;
+    if (!user || !id || !user.email_verified) return;
     Promise.all([
       clientFetch(`/api/chats/${id}`),
       clientFetch(`/api/chats/${id}/messages?limit=100`),
@@ -96,6 +96,11 @@ export default function ChatConversation() {
 
   if (!user) {
     router.push("/auth/login");
+    return null;
+  }
+
+  if (!user.email_verified) {
+    router.push("/chat");
     return null;
   }
 

@@ -22,6 +22,8 @@ import { isGovRole, isDevRole } from "@/lib/auth";
 import Avatar from "@/components/ui/Avatar";
 import Dropdown, { DropdownItem } from "@/components/ui/Dropdown";
 import { cn } from "@/lib/utils";
+import { clientFetch } from "@/lib/api";
+import toast from "react-hot-toast";
 
 export default function Navbar() {
   const { user, loaded } = useAuthStore();
@@ -48,6 +50,15 @@ export default function Navbar() {
     router.refresh();
   };
 
+  const handleResend = async () => {
+    try {
+      await clientFetch("/api/auth/resend-verification", { method: "POST" });
+      toast.success("Verification email resent!");
+    } catch (err) {
+      toast.error(err.message || "Failed to resend email");
+    }
+  };
+
   const navLinks = [
     { href: "/", label: "Home", icon: Home },
     { href: "/explore", label: "Explore", icon: Compass },
@@ -55,9 +66,25 @@ export default function Navbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-40 glass border-b border-surface-border/50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-16 gap-4">
+    <>
+      {/* Verification Banner */}
+      {loaded && user && !user.email_verified && (
+        <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2.5">
+          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-amber-700 dark:text-amber-400">
+            <p>Please check your inbox to verify your email address. You will not be able to comment until you do.</p>
+            <button
+              onClick={handleResend}
+              className="text-amber-800 dark:text-amber-200 font-semibold hover:underline bg-transparent border-none cursor-pointer"
+            >
+              Resend Email
+            </button>
+          </div>
+        </div>
+      )}
+
+      <header className="sticky top-0 z-40 glass border-b border-surface-border/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-16 gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-jw-primary to-jw-secondary flex items-center justify-center shadow-lg shadow-jw-primary/20 group-hover:shadow-jw-primary/40 transition-shadow">
@@ -196,5 +223,6 @@ export default function Navbar() {
         )}
       </div>
     </header>
+    </>
   );
 }

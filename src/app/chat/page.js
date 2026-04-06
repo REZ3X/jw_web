@@ -27,18 +27,22 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !user.email_verified) return;
     clientFetch("/api/chats?limit=50")
       .then((res) => setChats(res?.data || []))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [user]);
 
-  const createChat = async (type = "general") => {
+  const createChat = async () => {
+    if (!user.email_verified) {
+      toast.error("Please verify your email to use AI Chat.");
+      return;
+    }
     try {
       const res = await clientFetch("/api/chats", {
         method: "POST",
-        body: JSON.stringify({ chat_type: type }),
+        body: JSON.stringify({ chat_type: "agentic" }),
       });
       const newChat = res.data;
       router.push(`/chat/${newChat.id}`);
@@ -63,6 +67,31 @@ export default function ChatPage() {
     return null;
   }
 
+  if (!user.email_verified) {
+    return (
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-16 flex flex-col items-center text-center">
+        <div className="w-20 h-20 rounded-3xl bg-amber-500/10 flex items-center justify-center mx-auto mb-6">
+          <Bot className="w-10 h-10 text-amber-500" />
+        </div>
+        <h2 className="text-2xl font-bold mb-2">Verify Your Email First</h2>
+        <p className="text-sm text-muted mb-6 max-w-sm">
+          AI Chat requires a verified email address. Check your inbox for the verification link.
+        </p>
+        <button
+          onClick={async () => {
+            try {
+              await fetch("/api/auth/resend-verification", { method: "POST" });
+              toast.success("Verification email resent!");
+            } catch { toast.error("Failed to resend"); }
+          }}
+          className="px-6 py-2.5 rounded-xl bg-amber-500 text-white font-semibold hover:bg-amber-600 transition-colors cursor-pointer"
+        >
+          Resend Verification Email
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
       <div className="flex gap-6">
@@ -76,16 +105,10 @@ export default function ChatPage() {
             {/* New chat buttons */}
             <div className="space-y-2 mb-4">
               <button
-                onClick={() => createChat("general")}
-                className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-surface-border hover:bg-surface-hover transition-colors text-sm font-medium cursor-pointer"
+                onClick={createChat}
+                className="w-full flex items-center justify-center gap-2.5 px-3 py-3 rounded-xl bg-jw-primary text-white hover:bg-jw-primary-dark transition-colors text-sm font-medium cursor-pointer shadow-md shadow-jw-primary/20"
               >
-                <Bot className="w-4 h-4 text-jw-primary" /> New Chat
-              </button>
-              <button
-                onClick={() => createChat("agentic")}
-                className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl border border-jw-secondary/30 bg-jw-secondary/5 hover:bg-jw-secondary/10 transition-colors text-sm font-medium cursor-pointer"
-              >
-                <Wrench className="w-4 h-4 text-jw-secondary" /> New Agent Chat
+                <Bot className="w-4 h-4" /> Start New Chat
               </button>
             </div>
 
@@ -140,22 +163,13 @@ export default function ChatPage() {
               Ask questions about civic issues, get help drafting reports, or explore platform data with the agentic assistant.
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="flex justify-center">
               <button
-                onClick={() => createChat("general")}
-                className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-surface-border hover:border-jw-primary/30 hover:bg-jw-primary/5 transition-all cursor-pointer group"
+                onClick={createChat}
+                className="flex items-center gap-2.5 px-8 py-4 rounded-full bg-gradient-to-r from-jw-primary to-jw-secondary text-white shadow-xl shadow-jw-primary/20 hover:scale-105 active:scale-95 transition-all cursor-pointer font-semibold"
               >
-                <Bot className="w-6 h-6 text-jw-primary" />
-                <span className="text-sm font-semibold">General Chat</span>
-                <span className="text-xs text-muted">Conversational assistant</span>
-              </button>
-              <button
-                onClick={() => createChat("agentic")}
-                className="flex flex-col items-center gap-2 p-4 rounded-2xl border border-surface-border hover:border-jw-secondary/30 hover:bg-jw-secondary/5 transition-all cursor-pointer group"
-              >
-                <Wrench className="w-6 h-6 text-jw-secondary" />
-                <span className="text-sm font-semibold">Agent Chat</span>
-                <span className="text-xs text-muted">Search data, draft reports</span>
+                <MessageSquare className="w-5 h-5" />
+                Start Chatting
               </button>
             </div>
 

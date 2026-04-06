@@ -54,13 +54,13 @@ export default function CommentForm({ postId, commentId, isReply, onAdded, onCan
           type="text"
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder={isReply ? "Write a reply…" : "Add a comment…"}
+          placeholder={user.email_verified ? (isReply ? "Write a reply…" : "Add a comment…") : "Verify your email to comment"}
           className="w-full px-4 py-2.5 pr-12 bg-surface-hover/50 border border-surface-border rounded-xl text-sm placeholder:text-muted-light focus:outline-none focus:ring-2 focus:ring-jw-primary/30"
-          disabled={submitting}
+          disabled={submitting || !user.email_verified}
         />
         <button
           type="submit"
-          disabled={!content.trim() || submitting}
+          disabled={!content.trim() || submitting || !user.email_verified}
           className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-jw-primary hover:bg-jw-primary/10 disabled:opacity-30 transition-colors cursor-pointer"
         >
           <Send className="w-4 h-4" />

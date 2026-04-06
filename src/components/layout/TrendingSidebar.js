@@ -20,7 +20,7 @@ export default function TrendingSidebar() {
       fetch("/api/analytics/trending-tags").then((r) => r.json()).catch(() => ({})),
       fetch("/api/analytics/stats").then((r) => r.json()).catch(() => ({})),
     ]).then(([tagRes, statRes]) => {
-      setTags(tagRes?.data || []);
+      setTags(tagRes?.data?.trending_tags || []);
       setStats(statRes?.data || null);
       setLoading(false);
     });

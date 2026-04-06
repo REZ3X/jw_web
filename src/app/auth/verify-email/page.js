@@ -9,8 +9,10 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { clientFetch } from "@/lib/api";
+import { useAuthStore } from "@/lib/store";
 
 function VerifyContent() {
+  const { setUser } = useAuthStore();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const [status, setStatus] = useState("loading");
@@ -25,6 +27,7 @@ function VerifyContent() {
 
     clientFetch(`/api/auth/verify-email?token=${encodeURIComponent(token)}`)
       .then((res) => {
+        if (res.user) setUser(res.user);
         setStatus("success");
         setMessage(res.message || "Email verified successfully!");
       })

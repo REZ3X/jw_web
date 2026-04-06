@@ -6,7 +6,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Calendar, MapPin, Settings, FileText, MessageCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Calendar, MapPin, Settings, FileText, MessageCircle, ArrowLeft } from "lucide-react";
 import Avatar from "@/components/ui/Avatar";
 import Badge from "@/components/ui/Badge";
 import PostCard from "@/components/post/PostCard";
@@ -18,6 +19,7 @@ import { getRole, cn, formatDate, buildQuery } from "@/lib/utils";
 import { GOV_ROLES } from "@/lib/constants";
 
 export default function ProfileView({ profile }) {
+  const router = useRouter();
   const { user } = useAuthStore();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -39,6 +41,13 @@ export default function ProfileView({ profile }) {
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+      <button
+        onClick={() => router.back()}
+        className="flex items-center gap-1.5 text-sm text-muted hover:text-foreground mb-6 transition-colors cursor-pointer"
+      >
+        <ArrowLeft className="w-4 h-4" /> Back
+      </button>
+
       {/* Profile header */}
       <div className="bg-surface border border-surface-border rounded-2xl overflow-hidden mb-6">
         {/* Banner gradient */}

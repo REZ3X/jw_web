@@ -31,6 +31,10 @@ export default function VoteButtons({ type, id, upvotes: initUp, downvotes: init
       toast.error("Sign in to vote");
       return;
     }
+    if (!user.email_verified) {
+      toast.error("Please verify your email to vote");
+      return;
+    }
 
     const urlMap = {
       post: `/api/posts/${id}/vote`,

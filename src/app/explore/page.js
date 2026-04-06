@@ -7,26 +7,32 @@
 
 import { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Search, Filter, Hash, TrendingUp, X } from "lucide-react";
+import { Search, Filter, Hash, TrendingUp, X, Users, FileText as FileTextIcon } from "lucide-react";
 import PostCard from "@/components/post/PostCard";
 import { PostCardSkeleton } from "@/components/ui/Skeleton";
 import EmptyState from "@/components/ui/EmptyState";
 import Badge from "@/components/ui/Badge";
+import Avatar from "@/components/ui/Avatar";
 import { clientFetch } from "@/lib/api";
 import { POST_SORT_OPTIONS, DEPARTMENTS, POST_STATUS } from "@/lib/constants";
-import { cn, buildQuery, formatCount } from "@/lib/utils";
+import { cn, buildQuery, formatCount, getRole } from "@/lib/utils";
 import { FileText } from "lucide-react";
+import { useAuthStore } from "@/lib/store";
 
 function ExploreContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { user: currentUser } = useAuthStore();
 
+  const [tab, setTab] = useState("posts");
   const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
   const [activeTag, setActiveTag] = useState(searchParams.get("tag") || "");
   const [department, setDepartment] = useState(searchParams.get("department") || "");
   const [status, setStatus] = useState(searchParams.get("status") || "");
   const [sort, setSort] = useState("most_upvoted");
   const [posts, setPosts] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [usersLoading, setUsersLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [trendingTags, setTrendingTags] = useState([]);
   const [page, setPage] = useState(1);
@@ -34,7 +40,7 @@ function ExploreContent() {
 
   useEffect(() => {
     clientFetch("/api/analytics/trending-tags")
-      .then((res) => setTrendingTags(res?.data || []))
+      .then((res) => setTrendingTags(res?.data?.trending_tags || []))
       .catch(() => {});
   }, []);
 
@@ -68,8 +74,24 @@ function ExploreContent() {
   const handleSearch = (e) => {
     e.preventDefault();
     setPage(1);
-    fetchPosts(1);
+    if (tab === "users") {
+      searchUsersQuery();
+    } else {
+      fetchPosts(1);
+    }
   };
+
+  const searchUsersQuery = useCallback(async () => {
+    if (!searchQuery.trim()) { setUsers([]); return; }
+    setUsersLoading(true);
+    try {
+      const res = await clientFetch(`/api/users/search?q=${encodeURIComponent(searchQuery)}&limit=20`);
+      setUsers(res?.data || []);
+    } catch {
+      setUsers([]);
+    }
+    setUsersLoading(false);
+  }, [searchQuery]);
 
   const handleTagClick = (tag) => {
     setActiveTag(activeTag === tag ? "" : tag);
@@ -91,7 +113,29 @@ function ExploreContent() {
         {/* Main */}
         <div className="flex-1 max-w-2xl">
           <h1 className="text-2xl font-bold mb-1">Explore</h1>
-          <p className="text-sm text-muted mb-6">Discover reports, trending topics, and community insights</p>
+          <p className="text-sm text-muted mb-6">Discover reports, users, and community insights</p>
+
+          {/* Tabs */}
+          <div className="flex gap-1 p-1 bg-surface-hover rounded-xl mb-4">
+            <button
+              onClick={() => setTab("posts")}
+              className={cn(
+                "flex items-center gap-2 flex-1 justify-center py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer",
+                tab === "posts" ? "bg-surface text-foreground shadow-sm" : "text-muted hover:text-foreground"
+              )}
+            >
+              <FileTextIcon className="w-4 h-4" /> Reports
+            </button>
+            <button
+              onClick={() => { setTab("users"); if (searchQuery.trim()) searchUsersQuery(); }}
+              className={cn(
+                "flex items-center gap-2 flex-1 justify-center py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer",
+                tab === "users" ? "bg-surface text-foreground shadow-sm" : "text-muted hover:text-foreground"
+              )}
+            >
+              <Users className="w-4 h-4" /> People
+            </button>
+          </div>
 
           {/* Search */}
           <form onSubmit={handleSearch} className="relative mb-4">
@@ -100,7 +144,7 @@ function ExploreContent() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search reports by keyword, location, tag…"
+              placeholder={tab === "users" ? "Search people by name or username…" : "Search reports by keyword, location, tag…"}
               className="w-full pl-12 pr-4 py-3.5 bg-surface border-2 border-surface-border rounded-2xl text-sm placeholder:text-muted-light focus:outline-none focus:ring-2 focus:ring-jw-primary/30 focus:border-jw-primary/50 transition-all"
             />
           </form>
@@ -160,39 +204,87 @@ function ExploreContent() {
             </div>
           )}
 
-          {/* Posts */}
-          <div className="space-y-4">
-            {posts.map((post) => (
-              <PostCard key={post.id} post={post} />
-            ))}
-          </div>
-
-          {loading && (
-            <div className="space-y-4 mt-4">
-              <PostCardSkeleton />
-              <PostCardSkeleton />
+          {/* Users tab content */}
+          {tab === "users" && (
+            <div className="space-y-3">
+              {usersLoading && (
+                <div className="space-y-3">
+                  {[1,2,3].map(i => (
+                    <div key={i} className="h-20 rounded-2xl bg-surface-hover animate-shimmer" />
+                  ))}
+                </div>
+              )}
+              {!usersLoading && users.length === 0 && searchQuery.trim() && (
+                <EmptyState icon={Users} title="No users found" description="Try a different name or username" />
+              )}
+              {!usersLoading && users.length === 0 && !searchQuery.trim() && (
+                <EmptyState icon={Users} title="Search for people" description="Type a name or username above to find community members" />
+              )}
+              {users.map((u) => {
+                const isOwn = currentUser?.id === u.id;
+                const href = isOwn ? `/profile/${u.username}` : `/profile/${u.username}`;
+                const role = getRole(u.role);
+                return (
+                  <a
+                    key={u.id}
+                    href={href}
+                    className="flex items-center gap-4 p-4 bg-surface border border-surface-border rounded-2xl hover:border-jw-primary/30 hover:bg-jw-primary/5 transition-all group"
+                  >
+                    <Avatar src={u.avatar_url} name={u.name} size="md" isGovernment={u.is_government} />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="font-semibold text-sm group-hover:text-jw-primary transition-colors">
+                          {u.name}
+                          {isOwn && <span className="ml-1 text-xs font-normal text-muted">(You)</span>}
+                        </p>
+                        <span className={cn("text-xs px-2 py-0.5 rounded-full font-medium", role.color)}>{role.label}</span>
+                      </div>
+                      <p className="text-xs text-muted">@{u.username}</p>
+                      {u.bio && <p className="text-xs text-muted-light mt-0.5 truncate">{u.bio}</p>}
+                    </div>
+                  </a>
+                );
+              })}
             </div>
           )}
 
-          {!loading && posts.length === 0 && (
-            <EmptyState
-              icon={FileText}
-              title="No results found"
-              description="Try adjusting your search or filters"
-            />
-          )}
+          {/* Posts tab content */}
+          {tab === "posts" && (
+            <>
+              <div className="space-y-4">
+                {posts.map((post) => (
+                  <PostCard key={post.id} post={post} />
+                ))}
+              </div>
 
-          {hasMore && !loading && posts.length > 0 && (
-            <button
-              onClick={() => {
-                const next = page + 1;
-                setPage(next);
-                fetchPosts(next, true);
-              }}
-              className="w-full py-3 text-sm text-jw-primary font-medium hover:bg-jw-primary/5 rounded-xl transition-colors mt-4 cursor-pointer"
-            >
-              Load more
-            </button>
+              {loading && (
+                <div className="space-y-4 mt-4">
+                  <PostCardSkeleton />
+                  <PostCardSkeleton />
+                </div>
+              )}
+
+              {!loading && posts.length === 0 && (
+                <EmptyState
+                  icon={FileText}
+                  title="No results found"
+                  description="Try adjusting your search or filters"
+                />
+              )}
+
+              {hasMore && !loading && posts.length > 0 && (
+                <button
+                  onClick={() => {
+                    const next = page + 1;
+                    setPage(next);
+                    fetchPosts(next, true);
+                  }}
+                  className="w-full py-3 text-sm text-jw-primary font-medium hover:bg-jw-primary/5 rounded-xl transition-colors mt-4 cursor-pointer"
+                >
+                  Load more
+                </button>
+              )}
+            </>
           )}
         </div>
 

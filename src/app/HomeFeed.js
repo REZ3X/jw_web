@@ -19,7 +19,9 @@ import { POST_SORT_OPTIONS, DEPARTMENTS } from "@/lib/constants";
 import { cn, buildQuery } from "@/lib/utils";
 import { FileText } from "lucide-react";
 
-export default function HomeFeed({ initialPosts }) {
+import toast from "react-hot-toast";
+
+export default function HomeFeed({ initialPosts, isNewUser }) {
   const { user } = useAuthStore();
   const [posts, setPosts] = useState(initialPosts || []);
   const [page, setPage] = useState(1);
@@ -52,6 +54,17 @@ export default function HomeFeed({ initialPosts }) {
     setPage(1);
     fetchPosts(1);
   }, [fetchPosts]);
+
+  useEffect(() => {
+    if (isNewUser) {
+      toast.success("Welcome to JogjaWaskita! Please check your inbox to verify your email.", {
+        duration: 8000,
+        position: "top-center"
+      });
+      // Clean up the URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [isNewUser]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -168,10 +181,15 @@ export default function HomeFeed({ initialPosts }) {
         </aside>
       </div>
 
-      {/* Floating create button */}
       {user && !user.is_government && (
         <button
-          onClick={() => setShowCreateModal(true)}
+          onClick={() => {
+            if (!user.email_verified) {
+              toast.error("Please verify your email to create a report.");
+              return;
+            }
+            setShowCreateModal(true);
+          }}
           className="fixed bottom-6 right-6 w-14 h-14 rounded-2xl bg-gradient-to-r from-jw-primary to-jw-secondary text-white shadow-xl shadow-jw-primary/30 flex items-center justify-center hover:shadow-jw-primary/50 hover:scale-105 active:scale-95 transition-all z-30 cursor-pointer"
           title="Create Report"
         >
