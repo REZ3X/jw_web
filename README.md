@@ -8,12 +8,13 @@ This is the official Next.js frontend application for **JogjaWaskita**, a civic 
 
 The JogjaWaskita frontend is packed with modern features tailored for citizens, government officials, and platform administrators:
 
-- **🔐 Secure Authentication:** Seamless Google OAuth login. Authentication relies on HttpOnly cookies via a secure BFF architecture.
+- **🔐 Secure Authentication & RBAC:** Seamless Google OAuth login and email verification. Authentication relies on HttpOnly cookies via a secure BFF architecture. Role-Based Access Control completely gates comment creation, voting, and report drafting until citizens verify their email.
 - **📰 Centralized Feed:** A social media style community feed featuring infinite scroll, interactive vote actions, nested comments, and advanced filtering options.
 - **📸 Media & Reporting:** Users can upload up to 4 images per report, optionally specify locations, and rely on an AI-powered "Choose for me" button to automatically classify report departments.
-- **🤖 Dedicated AI Chat:** ChatGPT-style interface allowing users to converse with the JogjaWaskita AI Assistant. Supports general inquiries or complex agentic tool operations.
+- **🤖 Unified AI Assistant:** A sophisticated ChatGPT-style interface acting as a single entry point for conversational inquiries, guided civic issue reporting, and data exploration via natively injected agentic tools.
 - **🏛️ Government Dashboard:** Dedicated workspace for official departments to track, update, and manage the issue queue (Pending, In Progress, Resolved).
 - **🛡️ Dev Admin Panel:** High-level platform analytics, detailed user management, role assignments, and a system log viewer for auditing.
+- **🔍 Advanced Explore:** Search across active reports by keywords/departments or pivot into a dedicated 'People' tab to discover community profiles based on names and usernames.
 - **🎨 Modern Design:** Vibrant UI utilizing TailwindCSS v4. Complete with glassmorphism effects, dynamic micro-animations, and full dark-mode support.
 
 ---
