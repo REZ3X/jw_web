@@ -8,9 +8,10 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
-  BarChart3, Clock, CheckCircle, AlertCircle, ArrowUpRight,
-  FileText, TrendingUp, MessageSquare,
-} from "lucide-react";
+  HiChartBar, HiClock, HiCheckCircle, HiExclamationCircle,
+  HiArrowUpRight, HiDocumentText, HiArrowTrendingUp, HiChatBubbleLeftRight
+} from "react-icons/hi2";
+import { motion } from "framer-motion";
 import PostCard from "@/components/post/PostCard";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
@@ -21,6 +22,14 @@ import { clientFetch } from "@/lib/api";
 import { getDepartment, getStatus, cn, formatCount, buildQuery } from "@/lib/utils";
 import { GOV_ROLES, POST_STATUS } from "@/lib/constants";
 import toast from "react-hot-toast";
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i) => ({
+    opacity: 1, y: 0,
+    transition: { delay: i * 0.1, duration: 0.4, ease: [0.16, 1, 0.3, 1] }
+  })
+};
 
 export default function DashboardPage() {
   const { user } = useAuthStore();
@@ -74,63 +83,63 @@ export default function DashboardPage() {
 
   const dept = getDepartment(user.role);
 
+  const statCards = stats ? [
+    { icon: HiDocumentText, label: "Total Reports", value: formatCount(stats.total_posts || 0), color: "text-jw-accent" },
+    { icon: HiClock, label: "Pending", value: formatCount(stats.pending_posts || 0), color: "text-amber-400" },
+    { icon: HiArrowUpRight, label: "In Progress", value: formatCount(stats.in_progress_posts || 0), color: "text-blue-400" },
+    { icon: HiCheckCircle, label: "Resolved", value: formatCount(stats.closed_posts || 0), color: "text-emerald-400" },
+  ] : [];
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
       {/* Header */}
-      <div className="mb-8">
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="mb-8"
+      >
         <div className="flex items-center gap-3 mb-2">
           <div className={cn("w-3 h-3 rounded-full", dept.dotColor)} />
-          <h1 className="text-2xl font-bold">{dept.label} Dashboard</h1>
+          <h1 className="text-2xl font-bold gradient-text">{dept.label} Dashboard</h1>
         </div>
         <p className="text-sm text-muted">{dept.description}</p>
-      </div>
+      </motion.div>
 
       {/* Stats cards */}
       {stats && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="bg-surface border border-surface-border rounded-2xl p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <FileText className="w-4 h-4 text-muted" />
-              <span className="text-xs text-muted font-medium">Total Reports</span>
-            </div>
-            <p className="text-2xl font-bold">{formatCount(stats.total_posts || 0)}</p>
-          </div>
-          <div className="bg-surface border border-surface-border rounded-2xl p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <Clock className="w-4 h-4 text-amber-500" />
-              <span className="text-xs text-muted font-medium">Pending</span>
-            </div>
-            <p className="text-2xl font-bold text-amber-500">{formatCount(stats.pending_posts || 0)}</p>
-          </div>
-          <div className="bg-surface border border-surface-border rounded-2xl p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <ArrowUpRight className="w-4 h-4 text-blue-500" />
-              <span className="text-xs text-muted font-medium">In Progress</span>
-            </div>
-            <p className="text-2xl font-bold text-blue-500">{formatCount(stats.in_progress_posts || 0)}</p>
-          </div>
-          <div className="bg-surface border border-surface-border rounded-2xl p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <CheckCircle className="w-4 h-4 text-emerald-500" />
-              <span className="text-xs text-muted font-medium">Resolved</span>
-            </div>
-            <p className="text-2xl font-bold text-emerald-500">{formatCount(stats.closed_posts || 0)}</p>
-          </div>
+          {statCards.map((card, i) => (
+            <motion.div
+              key={card.label}
+              custom={i}
+              initial="hidden"
+              animate="visible"
+              variants={cardVariants}
+              className="glass-card rounded-2xl p-5"
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <card.icon className={cn("w-4 h-4", card.color)} />
+                <span className="text-xs text-muted font-semibold uppercase tracking-wider">{card.label}</span>
+              </div>
+              <p className={cn("text-2xl font-bold", card.color)}>{card.value}</p>
+            </motion.div>
+          ))}
         </div>
       )}
 
       {/* Posts queue */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">Report Queue</h2>
+      <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+        <h2 className="text-lg font-bold text-foreground">Report Queue</h2>
         <div className="flex gap-2">
           {["", "pending", "in_progress", "closed"].map((s) => (
             <button
               key={s}
               onClick={() => setStatusFilter(s)}
               className={cn(
-                "px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer",
+                "px-3 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer",
                 statusFilter === s
-                  ? "bg-jw-primary/10 text-jw-primary"
+                  ? "bg-jw-accent/15 text-jw-highlight border border-jw-accent/20"
                   : "text-muted hover:text-foreground hover:bg-surface-hover"
               )}
             >
@@ -147,7 +156,7 @@ export default function DashboardPage() {
         </div>
       ) : posts.length === 0 ? (
         <EmptyState
-          icon={FileText}
+          icon={HiDocumentText}
           title="No reports"
           description="No reports matching the selected filter"
         />
@@ -165,7 +174,7 @@ export default function DashboardPage() {
                       variant="outline"
                       onClick={() => handleStatusUpdate(post.id, "in_progress")}
                     >
-                      <ArrowUpRight className="w-3.5 h-3.5" /> Mark In Progress
+                      <HiArrowUpRight className="w-3.5 h-3.5" /> Mark In Progress
                     </Button>
                   )}
                   <Button
@@ -173,7 +182,7 @@ export default function DashboardPage() {
                     variant="primary"
                     onClick={() => handleStatusUpdate(post.id, "closed")}
                   >
-                    <CheckCircle className="w-3.5 h-3.5" /> Resolve
+                    <HiCheckCircle className="w-3.5 h-3.5" /> Resolve
                   </Button>
                 </div>
               )}

@@ -9,8 +9,10 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  Users, BarChart3, Shield, FileText, Search, ChevronRight, TrendingUp,
-} from "lucide-react";
+  HiUsers, HiChartBar, HiShieldCheck, HiDocumentText,
+  HiMagnifyingGlass, HiChevronRight, HiArrowTrendingUp
+} from "react-icons/hi2";
+import { motion } from "framer-motion";
 import Avatar from "@/components/ui/Avatar";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
@@ -19,6 +21,14 @@ import { clientFetch } from "@/lib/api";
 import { getRole, cn, formatCount, buildQuery, formatDate } from "@/lib/utils";
 import { ALL_ROLES } from "@/lib/constants";
 import toast from "react-hot-toast";
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i) => ({
+    opacity: 1, y: 0,
+    transition: { delay: i * 0.1, duration: 0.4, ease: [0.16, 1, 0.3, 1] }
+  })
+};
 
 export default function AdminPage() {
   const { user } = useAuthStore();
@@ -75,65 +85,69 @@ export default function AdminPage() {
 
   if (!user || user.role !== "dev") return null;
 
+  const statCards = overview ? [
+    { icon: HiUsers, label: "Total Users", value: formatCount(overview.platform?.total_users || 0), color: "text-jw-accent" },
+    { icon: HiDocumentText, label: "Total Reports", value: formatCount(overview.platform?.total_posts || 0), color: "text-jw-highlight" },
+    { icon: HiChartBar, label: "Resolved", value: formatCount(overview.platform?.closed_posts || 0), color: "text-emerald-400" },
+    { icon: HiArrowTrendingUp, label: "Pending", value: formatCount(overview.platform?.pending_posts || 0), color: "text-amber-400" },
+  ] : [];
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
-      <div className="flex items-center justify-between mb-8">
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center justify-between mb-8 flex-wrap gap-4"
+      >
         <div>
-          <h1 className="text-2xl font-bold">Admin Panel</h1>
+          <h1 className="text-2xl font-bold gradient-text">Admin Panel</h1>
           <p className="text-sm text-muted">Manage users, view analytics, and system logs</p>
         </div>
         <Link
           href="/admin/logs"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-surface-border text-sm font-medium hover:bg-surface-hover transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-surface-border text-sm font-medium hover:bg-surface-hover hover:border-jw-accent/30 transition-all duration-200 text-foreground"
         >
-          <FileText className="w-4 h-4" /> View Logs <ChevronRight className="w-4 h-4" />
+          <HiDocumentText className="w-4 h-4" /> View Logs <HiChevronRight className="w-4 h-4" />
         </Link>
-      </div>
+      </motion.div>
 
       {/* Overview stats */}
       {overview && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="bg-surface border border-surface-border rounded-2xl p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <Users className="w-4 h-4 text-jw-primary" />
-              <span className="text-xs text-muted font-medium">Total Users</span>
-            </div>
-            <p className="text-2xl font-bold">{formatCount(overview.platform?.total_users || 0)}</p>
-          </div>
-          <div className="bg-surface border border-surface-border rounded-2xl p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <FileText className="w-4 h-4 text-jw-secondary" />
-              <span className="text-xs text-muted font-medium">Total Reports</span>
-            </div>
-            <p className="text-2xl font-bold">{formatCount(overview.platform?.total_posts || 0)}</p>
-          </div>
-          <div className="bg-surface border border-surface-border rounded-2xl p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <BarChart3 className="w-4 h-4 text-emerald-500" />
-              <span className="text-xs text-muted font-medium">Resolved</span>
-            </div>
-            <p className="text-2xl font-bold text-emerald-500">{formatCount(overview.platform?.closed_posts || 0)}</p>
-          </div>
-          <div className="bg-surface border border-surface-border rounded-2xl p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <TrendingUp className="w-4 h-4 text-amber-500" />
-              <span className="text-xs text-muted font-medium">Pending</span>
-            </div>
-            <p className="text-2xl font-bold text-amber-500">{formatCount(overview.platform?.pending_posts || 0)}</p>
-          </div>
+          {statCards.map((card, i) => (
+            <motion.div
+              key={card.label}
+              custom={i}
+              initial="hidden"
+              animate="visible"
+              variants={cardVariants}
+              className="glass-card rounded-2xl p-5"
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <card.icon className={cn("w-4 h-4", card.color)} />
+                <span className="text-xs text-muted font-semibold uppercase tracking-wider">{card.label}</span>
+              </div>
+              <p className={cn("text-2xl font-bold", card.color)}>{card.value}</p>
+            </motion.div>
+          ))}
         </div>
       )}
 
       {/* User management */}
-      <div className="bg-surface border border-surface-border rounded-2xl overflow-hidden">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.2 }}
+        className="glass-card rounded-2xl overflow-hidden"
+      >
         <div className="px-6 py-4 border-b border-surface-border">
           <div className="flex items-center justify-between flex-wrap gap-3">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              <Users className="w-5 h-5 text-jw-primary" /> User Management
+            <h2 className="text-lg font-bold flex items-center gap-2 text-foreground">
+              <HiUsers className="w-5 h-5 text-jw-accent" /> User Management
             </h2>
             <div className="flex gap-2">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-light" />
+              <div className="relative group">
+                <HiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-light group-focus-within:text-jw-accent transition-colors" />
                 <input
                   type="text"
                   value={searchQuery}
@@ -142,7 +156,7 @@ export default function AdminPage() {
                     fetchUsers(e.target.value, roleFilter);
                   }}
                   placeholder="Search users…"
-                  className="pl-9 pr-3 py-2 bg-surface-hover border border-surface-border rounded-lg text-sm w-48 focus:outline-none focus:ring-2 focus:ring-jw-primary/30"
+                  className="pl-9 pr-3 py-2 bg-surface border border-surface-border rounded-lg text-sm w-48 focus:outline-none focus:ring-2 focus:ring-jw-accent/30 text-foreground transition-all duration-300"
                 />
               </div>
               <select
@@ -151,11 +165,11 @@ export default function AdminPage() {
                   setRoleFilter(e.target.value);
                   fetchUsers(searchQuery, e.target.value);
                 }}
-                className="text-sm bg-surface-hover border border-surface-border rounded-lg px-3 py-2 focus:outline-none cursor-pointer"
+                className="text-sm bg-surface border border-surface-border rounded-lg px-3 py-2 focus:outline-none cursor-pointer text-foreground"
               >
-                <option value="">All Roles</option>
+                <option value="" className="bg-surface">All Roles</option>
                 {ALL_ROLES.map((r) => (
-                  <option key={r} value={r}>{getRole(r).label}</option>
+                  <option key={r} value={r} className="bg-surface">{getRole(r).label}</option>
                 ))}
               </select>
             </div>
@@ -165,7 +179,7 @@ export default function AdminPage() {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="text-xs text-muted font-medium border-b border-surface-border">
+              <tr className="text-xs text-muted font-semibold border-b border-surface-border uppercase tracking-wider">
                 <th className="text-left px-6 py-3">User</th>
                 <th className="text-left px-6 py-3">Email</th>
                 <th className="text-left px-6 py-3">Role</th>
@@ -174,7 +188,7 @@ export default function AdminPage() {
                 <th className="text-left px-6 py-3">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-surface-border">
+            <tbody className="divide-y divide-surface-border/50">
               {loading ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-8 text-center text-sm text-muted">Loading…</td>
@@ -185,12 +199,12 @@ export default function AdminPage() {
                 </tr>
               ) : (
                 users.map((u) => (
-                  <tr key={u.id} className="hover:bg-surface-hover/50 transition-colors">
+                  <tr key={u.id} className="hover:bg-surface-hover/30 transition-colors">
                     <td className="px-6 py-3">
                       <div className="flex items-center gap-3">
                         <Avatar src={u.avatar_url} name={u.name} size="sm" isGovernment={u.is_government} />
                         <div>
-                          <p className="text-sm font-medium">{u.name}</p>
+                          <p className="text-sm font-medium text-foreground">{u.name}</p>
                           <p className="text-xs text-muted">@{u.username}</p>
                         </div>
                       </div>
@@ -200,7 +214,7 @@ export default function AdminPage() {
                       <Badge className={getRole(u.role).color}>{getRole(u.role).label}</Badge>
                     </td>
                     <td className="px-6 py-3">
-                      <span className={cn("text-xs font-medium", u.email_verified ? "text-emerald-500" : "text-amber-500")}>
+                      <span className={cn("text-xs font-semibold", u.email_verified ? "text-emerald-400" : "text-amber-400")}>
                         {u.email_verified ? "Yes" : "No"}
                       </span>
                     </td>
@@ -209,10 +223,10 @@ export default function AdminPage() {
                       <select
                         value={u.role}
                         onChange={(e) => handleRoleChange(u.id, e.target.value)}
-                        className="text-xs bg-surface-hover border border-surface-border rounded-lg px-2 py-1 focus:outline-none cursor-pointer"
+                        className="text-xs bg-surface border border-surface-border rounded-lg px-2 py-1 focus:outline-none cursor-pointer text-foreground"
                       >
                         {ALL_ROLES.map((r) => (
-                          <option key={r} value={r}>{getRole(r).label}</option>
+                          <option key={r} value={r} className="bg-surface">{getRole(r).label}</option>
                         ))}
                       </select>
                     </td>
@@ -222,7 +236,7 @@ export default function AdminPage() {
             </tbody>
           </table>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

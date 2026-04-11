@@ -8,8 +8,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import {
-  ChevronDown, ChevronUp, Pin, MoreHorizontal, Trash2, Pencil, Image as ImageIcon,
-} from "lucide-react";
+  HiChevronDown, HiChevronUp, HiMapPin, HiEllipsisHorizontal, HiTrash, HiPencilSquare
+} from "react-icons/hi2";
+import { BsPin } from "react-icons/bs";
 import Avatar from "@/components/ui/Avatar";
 import Badge from "@/components/ui/Badge";
 import VoteButtons from "@/components/post/VoteButtons";
@@ -76,10 +77,10 @@ export default function CommentItem({ comment, postOwnerId, onDeleted }) {
   };
 
   return (
-    <div className={cn("py-3", comment.is_pinned && "bg-jw-primary/5 rounded-xl px-3 -mx-3")}>
+    <div className={cn("py-3", comment.is_pinned && "bg-jw-accent/5 rounded-xl px-3 -mx-3 border border-jw-accent/10")}>
       {comment.is_pinned && (
-        <div className="flex items-center gap-1 text-xs text-jw-primary font-medium mb-1.5">
-          <Pin className="w-3 h-3" /> Pinned
+        <div className="flex items-center gap-1 text-xs text-jw-accent font-semibold mb-1.5">
+          <BsPin className="w-3 h-3" /> Pinned
         </div>
       )}
 
@@ -90,12 +91,12 @@ export default function CommentItem({ comment, postOwnerId, onDeleted }) {
 
         <div className="flex-1 min-w-0">
           {/* Header */}
-          <div className="flex items-center gap-2 mb-0.5">
-            <Link href={`/profile/${comment.username}`} className="text-sm font-semibold hover:text-jw-primary transition-colors">
+          <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+            <Link href={`/profile/${comment.username}`} className="text-sm font-semibold hover:text-jw-highlight transition-colors">
               {comment.user_name}
             </Link>
             {comment.is_official && (
-              <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 text-[10px]">
+              <Badge className="bg-jw-accent/15 text-jw-highlight border border-jw-accent/30 text-[10px]">
                 Official Response
               </Badge>
             )}
@@ -105,16 +106,16 @@ export default function CommentItem({ comment, postOwnerId, onDeleted }) {
             {/* Actions dropdown */}
             {(isOwner || isPostOwner) && (
               <Dropdown
-                trigger={<MoreHorizontal className="w-4 h-4 text-muted hover:text-foreground" />}
+                trigger={<HiEllipsisHorizontal className="w-4 h-4 text-muted hover:text-foreground cursor-pointer" />}
               >
                 {isPostOwner && (
                   <DropdownItem onClick={handlePin}>
-                    <Pin className="w-3.5 h-3.5" /> {comment.is_pinned ? "Unpin" : "Pin"}
+                    <BsPin className="w-3.5 h-3.5" /> {comment.is_pinned ? "Unpin" : "Pin"}
                   </DropdownItem>
                 )}
                 {isOwner && (
                   <DropdownItem danger onClick={handleDelete}>
-                    <Trash2 className="w-3.5 h-3.5" /> Delete
+                    <HiTrash className="w-3.5 h-3.5" /> Delete
                   </DropdownItem>
                 )}
               </Dropdown>
@@ -122,11 +123,11 @@ export default function CommentItem({ comment, postOwnerId, onDeleted }) {
           </div>
 
           {/* Content */}
-          <p className="text-sm leading-relaxed text-foreground/90 whitespace-pre-wrap">{comment.content}</p>
+          <p className="text-sm leading-relaxed text-foreground/85 whitespace-pre-wrap">{comment.content}</p>
 
           {/* Official image */}
           {comment.official_image_url && (
-            <div className="mt-2 rounded-xl overflow-hidden max-w-sm">
+            <div className="mt-2 rounded-xl overflow-hidden max-w-sm border border-surface-border">
               <img src={comment.official_image_url} alt="Official response" className="w-full" />
             </div>
           )}
@@ -144,7 +145,7 @@ export default function CommentItem({ comment, postOwnerId, onDeleted }) {
             {user && (
               <button
                 onClick={() => setShowReplyForm(!showReplyForm)}
-                className="text-xs text-muted hover:text-jw-primary font-medium transition-colors cursor-pointer"
+                className="text-xs text-muted hover:text-jw-accent font-semibold transition-colors cursor-pointer"
               >
                 Reply
               </button>
@@ -152,9 +153,9 @@ export default function CommentItem({ comment, postOwnerId, onDeleted }) {
             {comment.reply_count > 0 && (
               <button
                 onClick={loadReplies}
-                className="flex items-center gap-1 text-xs text-jw-primary font-medium hover:text-jw-primary-light transition-colors cursor-pointer"
+                className="flex items-center gap-1 text-xs text-jw-accent font-semibold hover:text-jw-highlight transition-colors cursor-pointer"
               >
-                {showReplies ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                {showReplies ? <HiChevronUp className="w-3.5 h-3.5" /> : <HiChevronDown className="w-3.5 h-3.5" />}
                 {comment.reply_count} {comment.reply_count === 1 ? "reply" : "replies"}
               </button>
             )}
@@ -174,7 +175,7 @@ export default function CommentItem({ comment, postOwnerId, onDeleted }) {
 
           {/* Replies */}
           {showReplies && replies.length > 0 && (
-            <div className="mt-3 space-y-1 pl-2 border-l-2 border-surface-border">
+            <div className="mt-3 space-y-1 pl-2 border-l-2 border-jw-accent/20">
               {replies.map((reply) => (
                 <SubCommentItem key={reply.id} reply={reply} commentId={comment.id} />
               ))}

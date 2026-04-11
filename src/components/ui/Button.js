@@ -1,54 +1,56 @@
 "use client";
 
 /**
- * Reusable button component with multiple variants.
+ * Button component with variants.
  */
 
 import { cn } from "@/lib/utils";
+import { ImSpinner8 } from "react-icons/im";
 
 const VARIANTS = {
-  primary: "bg-jw-primary text-white hover:bg-jw-primary-dark shadow-sm",
-  secondary: "bg-jw-secondary text-white hover:bg-jw-secondary-light shadow-sm",
-  outline: "border border-surface-border text-foreground hover:bg-surface-hover",
-  ghost: "text-muted hover:bg-surface-hover hover:text-foreground",
-  danger: "bg-red-500 text-white hover:bg-red-600 shadow-sm",
+  primary:
+    "gradient-btn font-semibold",
+  secondary:
+    "bg-bg-card border border-border-default text-text-primary hover:bg-bg-card-hover hover:border-border-accent font-semibold",
+  outline:
+    "border border-border-default text-text-secondary hover:border-jw-accent hover:text-jw-mint bg-transparent font-semibold",
+  ghost:
+    "text-text-muted hover:text-text-primary hover:bg-bg-card-hover font-medium",
+  danger:
+    "bg-danger/10 border border-danger/20 text-danger hover:bg-danger/20 font-semibold",
 };
 
 const SIZES = {
-  sm: "px-3 py-1.5 text-xs",
-  md: "px-4 py-2 text-sm",
-  lg: "px-6 py-2.5 text-base",
+  xs:  "text-xs px-2 py-1 rounded-md gap-1",
+  sm:  "text-xs px-3 py-1.5 rounded-lg gap-1.5",
+  md:  "text-sm px-4 py-2 rounded-xl gap-2",
+  lg:  "text-sm px-6 py-2.5 rounded-xl gap-2",
 };
 
 export default function Button({
-  children,
-  variant = "primary",
-  size = "md",
-  className,
-  disabled,
-  loading,
-  ...props
+  children, variant = "primary", size = "md",
+  loading, disabled, className, type = "button", ...props
 }) {
   return (
     <button
+      type={type}
+      disabled={disabled || loading}
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-200 cursor-pointer",
-        "disabled:opacity-50 disabled:cursor-not-allowed",
-        "active:scale-[0.97]",
+        "inline-flex items-center justify-center transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:pointer-events-none",
         VARIANTS[variant],
         SIZES[size],
         className
       )}
-      disabled={disabled || loading}
       {...props}
     >
-      {loading && (
-        <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-        </svg>
+      {loading ? (
+        <>
+          <ImSpinner8 className="w-3.5 h-3.5 animate-spin" />
+          <span>Loading…</span>
+        </>
+      ) : (
+        children
       )}
-      {children}
     </button>
   );
 }

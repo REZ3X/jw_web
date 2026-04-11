@@ -1,28 +1,26 @@
 "use client";
 
 /**
- * Navbar — top navigation bar.
- *
- * Displays:
- * - Logo + brand name
- * - Search bar (navigates to /explore)
- * - Nav links (Home, Explore, Chat)
- * - Auth: "Join Now" button or profile avatar dropdown
+ * Navbar — top navigation with glass effect.
  */
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import {
-  Search, Menu, X, MessageSquare, Compass, Home,
-  User, LogOut, LayoutDashboard, Settings, Shield,
-} from "lucide-react";
+  HiMagnifyingGlass, HiBars3, HiXMark,
+  HiHome, HiGlobeAlt, HiChatBubbleLeftRight,
+  HiUser, HiArrowRightOnRectangle, HiSquares2X2,
+  HiCog6Tooth, HiShieldCheck
+} from "react-icons/hi2";
 import { useAuthStore } from "@/lib/store";
 import { isGovRole, isDevRole } from "@/lib/auth";
 import Avatar from "@/components/ui/Avatar";
 import Dropdown, { DropdownItem } from "@/components/ui/Dropdown";
 import { cn } from "@/lib/utils";
 import { clientFetch } from "@/lib/api";
+import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 
 export default function Navbar() {
@@ -40,6 +38,7 @@ export default function Navbar() {
     if (search.trim()) {
       router.push(`/explore?search=${encodeURIComponent(search.trim())}`);
       setSearch("");
+      setMobileOpen(false);
     }
   };
 
@@ -60,21 +59,21 @@ export default function Navbar() {
   };
 
   const navLinks = [
-    { href: "/", label: "Home", icon: Home },
-    { href: "/explore", label: "Explore", icon: Compass },
-    ...(user ? [{ href: "/chat", label: "AI Chat", icon: MessageSquare }] : []),
+    { href: "/", label: "Home", icon: HiHome },
+    { href: "/explore", label: "Explore", icon: HiGlobeAlt },
+    ...(user ? [{ href: "/chat", label: "AI Chat", icon: HiChatBubbleLeftRight }] : []),
   ];
 
   return (
     <>
       {/* Verification Banner */}
       {loaded && user && !user.email_verified && (
-        <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2.5">
-          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-amber-700 dark:text-amber-400">
-            <p>Please check your inbox to verify your email address. You will not be able to comment until you do.</p>
+        <div className="bg-warning/10 border-b border-warning/20 px-4 py-2 relative z-50">
+          <div className="max-w-[1200px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-warning">
+            <p>Please verify your email address. You won&apos;t be able to comment until you do.</p>
             <button
               onClick={handleResend}
-              className="text-amber-800 dark:text-amber-200 font-semibold hover:underline bg-transparent border-none cursor-pointer"
+              className="font-semibold hover:underline cursor-pointer whitespace-nowrap"
             >
               Resend Email
             </button>
@@ -82,147 +81,175 @@ export default function Navbar() {
         </div>
       )}
 
-      <header className="sticky top-0 z-40 glass border-b border-surface-border/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between h-16 gap-4">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-jw-primary to-jw-secondary flex items-center justify-center shadow-lg shadow-jw-primary/20 group-hover:shadow-jw-primary/40 transition-shadow">
-              <Shield className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-lg font-bold bg-gradient-to-r from-jw-primary to-jw-secondary bg-clip-text text-transparent hidden sm:block">
-              JogjaWaskita
-            </span>
-          </Link>
+      <header className="sticky top-0 z-40 glass border-b border-border-default">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-14 gap-4">
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-2 shrink-0 group">
+              <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center">
+                <Image
+                  src="/assets/green-logo.png"
+                  alt="JogjaWaskita"
+                  width={24}
+                  height={24}
+                  className="object-contain"
+                />
+              </div>
+              <span className="text-base font-bold text-jw-mint hidden sm:block">
+                JogjaWaskita
+              </span>
+            </Link>
 
-          {/* Search — desktop */}
-          <form onSubmit={handleSearch} className="hidden md:block flex-1 max-w-md">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-light" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search reports, tags, locations…"
-                className="w-full pl-10 pr-4 py-2 bg-surface-hover/60 border border-surface-border/50 rounded-xl text-sm placeholder:text-muted-light focus:outline-none focus:ring-2 focus:ring-jw-primary/30 focus:border-jw-primary/50 transition-all"
-              />
-            </div>
-          </form>
-
-          {/* Nav links — desktop */}
-          <nav className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                  isActive(link.href)
-                    ? "bg-jw-primary/10 text-jw-primary"
-                    : "text-muted hover:text-foreground hover:bg-surface-hover"
-                )}
-              >
-                <link.icon className="w-4 h-4" />
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-
-          {/* Right: Auth actions */}
-          <div className="flex items-center gap-3">
-            {loaded && !user && (
-              <Link
-                href="/auth/login"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-jw-primary to-jw-secondary text-white text-sm font-semibold shadow-md shadow-jw-primary/20 hover:shadow-jw-primary/40 transition-all hover:scale-[1.02] active:scale-[0.98]"
-              >
-                Join Now
-              </Link>
-            )}
-
-            {loaded && user && (
-              <Dropdown
-                trigger={
-                  <Avatar
-                    src={user.avatar_url}
-                    name={user.name}
-                    size="sm"
-                    isGovernment={user.is_government}
-                    className="cursor-pointer hover:ring-jw-primary/50 transition-all"
-                  />
-                }
-              >
-                <div className="px-4 py-2.5 border-b border-surface-border">
-                  <p className="text-sm font-semibold truncate">{user.name}</p>
-                  <p className="text-xs text-muted truncate">@{user.username}</p>
-                </div>
-                <DropdownItem onClick={() => router.push(`/profile/${user.username}`)}>
-                  <User className="w-4 h-4" /> Profile
-                </DropdownItem>
-                <DropdownItem onClick={() => router.push("/profile/settings")}>
-                  <Settings className="w-4 h-4" /> Settings
-                </DropdownItem>
-                {(isGovRole(user.role) || isDevRole(user.role)) && (
-                  <DropdownItem onClick={() => router.push("/dashboard")}>
-                    <LayoutDashboard className="w-4 h-4" /> Dashboard
-                  </DropdownItem>
-                )}
-                {isDevRole(user.role) && (
-                  <DropdownItem onClick={() => router.push("/admin")}>
-                    <Shield className="w-4 h-4" /> Admin Panel
-                  </DropdownItem>
-                )}
-                <div className="border-t border-surface-border my-1" />
-                <DropdownItem danger onClick={handleLogout}>
-                  <LogOut className="w-4 h-4" /> Log Out
-                </DropdownItem>
-              </Dropdown>
-            )}
-
-            {/* Mobile menu toggle */}
-            <button
-              className="md:hidden p-2 rounded-lg text-muted hover:bg-surface-hover transition-colors cursor-pointer"
-              onClick={() => setMobileOpen(!mobileOpen)}
-            >
-              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile menu */}
-        {mobileOpen && (
-          <div className="md:hidden border-t border-surface-border py-3 animate-slide-down">
-            <form onSubmit={handleSearch} className="mb-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-light" />
+            {/* Search — desktop */}
+            <form onSubmit={handleSearch} className="hidden md:block flex-1 max-w-sm">
+              <div className="relative group">
+                <HiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-dim group-focus-within:text-jw-accent transition-colors" />
                 <input
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search reports…"
-                  className="w-full pl-10 pr-4 py-2.5 bg-surface-hover/60 border border-surface-border/50 rounded-xl text-sm placeholder:text-muted-light focus:outline-none focus:ring-2 focus:ring-jw-primary/30"
+                  className="w-full pl-9 pr-4 py-2 bg-bg-input border border-border-default rounded-lg text-sm
+                    text-text-primary placeholder:text-text-dim
+                    focus:outline-none focus:ring-1 focus:ring-jw-accent/40 focus:border-jw-accent/40
+                    transition-all duration-200"
                 />
               </div>
             </form>
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
-                  isActive(link.href)
-                    ? "bg-jw-primary/10 text-jw-primary"
-                    : "text-muted hover:text-foreground hover:bg-surface-hover"
-                )}
+
+            {/* Nav links — desktop */}
+            <nav className="hidden md:flex items-center gap-0.5">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors duration-150",
+                    isActive(link.href)
+                      ? "bg-jw-accent/12 text-jw-mint"
+                      : "text-text-muted hover:text-text-primary hover:bg-bg-card-hover"
+                  )}
+                >
+                  <link.icon className="w-4 h-4" />
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+
+            {/* Right: Auth */}
+            <div className="flex items-center gap-2.5">
+              {loaded && !user && (
+                <Link
+                  href="/auth/login"
+                  className="px-4 py-2 rounded-lg gradient-btn text-sm font-semibold"
+                >
+                  Join Now
+                </Link>
+              )}
+
+              {loaded && user && (
+                <Dropdown
+                  trigger={
+                    <Avatar
+                      src={user.avatar_url}
+                      name={user.name}
+                      size="sm"
+                      isGovernment={user.is_government}
+                      className="cursor-pointer"
+                    />
+                  }
+                >
+                  <div className="px-3.5 py-2.5 border-b border-border-subtle">
+                    <p className="text-sm font-semibold text-text-primary truncate">{user.name}</p>
+                    <p className="text-xs text-text-muted truncate">@{user.username}</p>
+                  </div>
+                  <DropdownItem onClick={() => router.push(`/profile/${user.username}`)}>
+                    <HiUser className="w-4 h-4" /> Profile
+                  </DropdownItem>
+                  <DropdownItem onClick={() => router.push("/profile/settings")}>
+                    <HiCog6Tooth className="w-4 h-4" /> Settings
+                  </DropdownItem>
+                  {(isGovRole(user.role) || isDevRole(user.role)) && (
+                    <DropdownItem onClick={() => router.push("/dashboard")}>
+                      <HiSquares2X2 className="w-4 h-4" /> Dashboard
+                    </DropdownItem>
+                  )}
+                  {isDevRole(user.role) && (
+                    <DropdownItem onClick={() => router.push("/admin")}>
+                      <HiShieldCheck className="w-4 h-4" /> Admin
+                    </DropdownItem>
+                  )}
+                  <div className="border-t border-border-subtle my-0.5" />
+                  <DropdownItem danger onClick={handleLogout}>
+                    <HiArrowRightOnRectangle className="w-4 h-4" /> Log Out
+                  </DropdownItem>
+                </Dropdown>
+              )}
+
+              {/* Mobile menu toggle */}
+              <button
+                className="md:hidden p-1.5 rounded-lg text-text-muted hover:bg-bg-card-hover transition-colors cursor-pointer"
+                onClick={() => setMobileOpen(!mobileOpen)}
               >
-                <link.icon className="w-4 h-4" />
-                {link.label}
-              </Link>
-            ))}
+                {mobileOpen ? <HiXMark className="w-5 h-5" /> : <HiBars3 className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
-        )}
-      </div>
-    </header>
+
+          {/* Mobile menu */}
+          <AnimatePresence>
+            {mobileOpen && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="md:hidden border-t border-border-default overflow-hidden"
+              >
+                <div className="py-3 space-y-1">
+                  <form onSubmit={handleSearch} className="mb-3">
+                    <div className="relative">
+                      <HiMagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-dim" />
+                      <input
+                        type="text"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        placeholder="Search…"
+                        className="w-full pl-9 pr-4 py-2 bg-bg-input border border-border-default rounded-lg text-sm text-text-primary placeholder:text-text-dim focus:outline-none focus:ring-1 focus:ring-jw-accent/40"
+                      />
+                    </div>
+                  </form>
+                  {navLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setMobileOpen(false)}
+                      className={cn(
+                        "flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                        isActive(link.href)
+                          ? "bg-jw-accent/12 text-jw-mint"
+                          : "text-text-muted hover:text-text-primary hover:bg-bg-card-hover"
+                      )}
+                    >
+                      <link.icon className="w-4 h-4" />
+                      {link.label}
+                    </Link>
+                  ))}
+                  {loaded && !user && (
+                    <Link
+                      href="/auth/login"
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center justify-center gap-2 mx-1 mt-2 px-4 py-2 rounded-lg gradient-btn text-sm font-semibold"
+                    >
+                      Join Now
+                    </Link>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </header>
     </>
   );
 }

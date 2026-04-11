@@ -22,12 +22,12 @@ export default function SubCommentItem({ reply, commentId }) {
       </Link>
 
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-0.5">
-          <Link href={`/profile/${reply.username}`} className="text-xs font-semibold hover:text-jw-primary transition-colors">
+        <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+          <Link href={`/profile/${reply.username}`} className="text-xs font-semibold hover:text-jw-highlight transition-colors">
             {reply.user_name}
           </Link>
           {reply.is_official && (
-            <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 text-[10px]">
+            <Badge className="bg-jw-accent/15 text-jw-highlight border border-jw-accent/30 text-[10px]">
               Official
             </Badge>
           )}
@@ -35,11 +35,11 @@ export default function SubCommentItem({ reply, commentId }) {
           {reply.is_edited && <span className="text-[11px] text-muted-light">(edited)</span>}
         </div>
 
-        <p className="text-sm leading-relaxed text-foreground/90">
+        <p className="text-sm leading-relaxed text-foreground/85">
           {reply.reply_to_username && (
             <Link
               href={`/profile/${reply.reply_to_username}`}
-              className="text-jw-primary font-medium mr-1"
+              className="text-jw-accent font-semibold mr-1"
             >
               @{reply.reply_to_username}
             </Link>
