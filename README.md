@@ -85,6 +85,11 @@ Ensure that `BACKEND_URL` in the `.env` points to your backend instance. If runn
 BACKEND_URL=http://localhost:8000
 ```
 
+For **production/staging**, also set `NEXT_PUBLIC_SITE_URL` to your public domain so OAuth redirects resolve correctly (instead of the internal server address):
+```env
+NEXT_PUBLIC_SITE_URL=https://your-domain.com
+```
+
 ### 3. Start Development Server
 Start hacking locally:
 ```bash
