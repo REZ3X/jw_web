@@ -1,31 +1,35 @@
 "use client";
 
 /**
- * Avatar component with optional government badge overlay.
- * Renders user avatar with fallback initials and role badge for gov users.
+ * Avatar component with optional government badge.
+ * Uses rounded-square shape (rounded corners, not fully circular).
  */
 
 import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { Shield } from "lucide-react";
+import { HiShieldCheck } from "react-icons/hi2";
 
 const SIZES = {
-  xs: "w-6 h-6 text-xs",
-  sm: "w-8 h-8 text-sm",
-  md: "w-10 h-10 text-base",
-  lg: "w-12 h-12 text-lg",
-  xl: "w-16 h-16 text-xl",
-  "2xl": "w-24 h-24 text-3xl",
+  xs: "w-6 h-6 text-[10px]",
+  sm: "w-8 h-8 text-xs",
+  md: "w-10 h-10 text-sm",
+  lg: "w-12 h-12 text-base",
+  xl: "w-16 h-16 text-lg",
+  "2xl": "w-24 h-24 text-2xl",
+};
+
+const RADIUS = {
+  xs: "rounded-md",
+  sm: "rounded-lg",
+  md: "rounded-xl",
+  lg: "rounded-xl",
+  xl: "rounded-2xl",
+  "2xl": "rounded-3xl",
 };
 
 export default function Avatar({ src, name, size = "md", isGovernment = false, className }) {
   const initials = name
-    ? name
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase()
+    ? name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()
     : "?";
 
   return (
@@ -33,28 +37,25 @@ export default function Avatar({ src, name, size = "md", isGovernment = false, c
       <div
         className={cn(
           SIZES[size],
-          "rounded-full overflow-hidden bg-gradient-to-br from-jw-primary/20 to-jw-secondary/20 flex items-center justify-center font-semibold text-jw-primary ring-2 ring-surface-border"
+          RADIUS[size] || "rounded-xl",
+          "relative overflow-hidden flex items-center justify-center font-bold",
+          src
+            ? "ring-1 ring-border-subtle"
+            : "bg-jw-secondary text-jw-mint/80 ring-1 ring-jw-accent/20"
         )}
       >
         {src ? (
-          <Image
-            src={src}
-            alt={name || "Avatar"}
-            fill
-            className="object-cover"
-            sizes="96px"
-          />
+          <Image src={src} alt={name || "Avatar"} fill className="object-cover" sizes="96px" />
         ) : (
           <span>{initials}</span>
         )}
       </div>
-      {/* Government badge overlay */}
       {isGovernment && (
         <div
-          className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center ring-2 ring-surface"
+          className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-jw-accent rounded-full flex items-center justify-center ring-2 ring-bg-primary"
           title="Official Government Account"
         >
-          <Shield className="w-2.5 h-2.5 text-white" />
+          <HiShieldCheck className="w-2.5 h-2.5 text-white" />
         </div>
       )}
     </div>

@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect, useCallback } from "react";
-import { SlidersHorizontal } from "lucide-react";
+import { HiAdjustmentsHorizontal, HiChatBubbleOvalLeft } from "react-icons/hi2";
 import CommentItem from "./CommentItem";
 import CommentForm from "./CommentForm";
 import { CommentSkeleton } from "@/components/ui/Skeleton";
@@ -15,7 +15,6 @@ import { clientFetch } from "@/lib/api";
 import { useAuthStore } from "@/lib/store";
 import { COMMENT_SORT_OPTIONS } from "@/lib/constants";
 import { cn, buildQuery } from "@/lib/utils";
-import { MessageCircle } from "lucide-react";
 
 export default function CommentSection({ postId, postOwnerId }) {
   const { user } = useAuthStore();
@@ -57,19 +56,19 @@ export default function CommentSection({ postId, postOwnerId }) {
     <div>
       {/* Header + Sort */}
       <div className="flex items-center justify-between mb-4">
-        <h3 className="font-semibold text-sm flex items-center gap-2">
-          <MessageCircle className="w-4 h-4 text-jw-primary" />
+        <h3 className="font-semibold text-sm flex items-center gap-2 text-foreground">
+          <HiChatBubbleOvalLeft className="w-4 h-4 text-jw-accent" />
           Comments
         </h3>
         <div className="flex items-center gap-1">
-          <SlidersHorizontal className="w-3.5 h-3.5 text-muted" />
+          <HiAdjustmentsHorizontal className="w-3.5 h-3.5 text-muted" />
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value)}
             className="text-xs bg-transparent border-none text-muted focus:outline-none cursor-pointer"
           >
             {COMMENT_SORT_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
+              <option key={opt.value} value={opt.value} className="bg-surface text-foreground">{opt.label}</option>
             ))}
           </select>
         </div>
@@ -91,7 +90,7 @@ export default function CommentSection({ postId, postOwnerId }) {
         </div>
       ) : comments.length === 0 ? (
         <EmptyState
-          icon={MessageCircle}
+          icon={HiChatBubbleOvalLeft}
           title="No comments yet"
           description="Be the first to comment on this report"
           className="py-8"
@@ -109,7 +108,7 @@ export default function CommentSection({ postId, postOwnerId }) {
           {hasMore && (
             <button
               onClick={handleLoadMore}
-              className="w-full py-2 text-sm text-jw-primary font-medium hover:text-jw-primary-light transition-colors cursor-pointer"
+              className="w-full py-2 text-sm text-jw-accent font-semibold hover:text-jw-highlight transition-colors cursor-pointer"
             >
               Load more comments
             </button>

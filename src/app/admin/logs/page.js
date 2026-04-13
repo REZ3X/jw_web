@@ -6,7 +6,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Shield, Activity, Search, RefreshCw } from "lucide-react";
+import { HiArrowLeft, HiShieldCheck, HiChartBar, HiMagnifyingGlass, HiArrowPath } from "react-icons/hi2";
+import { motion } from "framer-motion";
 import Button from "@/components/ui/Button";
 import Badge from "@/components/ui/Badge";
 import { useAuthStore } from "@/lib/store";
@@ -51,51 +52,60 @@ export default function LogsPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
-      <div className="flex items-center gap-3 mb-6">
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center gap-3 mb-6"
+      >
         <button
           onClick={() => router.push("/admin")}
-          className="p-1.5 rounded-lg text-muted hover:bg-surface-hover transition-colors cursor-pointer"
+          className="p-1.5 rounded-lg text-muted hover:bg-surface-hover hover:text-foreground transition-all duration-200 cursor-pointer"
         >
-          <ArrowLeft className="w-5 h-5" />
+          <HiArrowLeft className="w-5 h-5" />
         </button>
         <div>
-          <h1 className="text-2xl font-bold">System Logs</h1>
+          <h1 className="text-2xl font-bold gradient-text">System Logs</h1>
           <p className="text-sm text-muted">Authentication and activity audit trail</p>
         </div>
-      </div>
+      </motion.div>
 
       {/* Tabs */}
       <div className="flex items-center gap-2 mb-6">
         <button
           onClick={() => { setTab("auth"); setActionFilter(""); setFeatureFilter(""); }}
           className={cn(
-            "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors cursor-pointer",
-            tab === "auth" ? "bg-jw-primary/10 text-jw-primary" : "text-muted hover:bg-surface-hover"
+            "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer",
+            tab === "auth" ? "bg-jw-accent/15 text-jw-highlight border border-jw-accent/20" : "text-muted hover:bg-surface-hover"
           )}
         >
-          <Shield className="w-4 h-4" /> Auth Logs
+          <HiShieldCheck className="w-4 h-4" /> Auth Logs
         </button>
         <button
           onClick={() => { setTab("activity"); setActionFilter(""); setFeatureFilter(""); }}
           className={cn(
-            "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors cursor-pointer",
-            tab === "activity" ? "bg-jw-secondary/10 text-jw-secondary" : "text-muted hover:bg-surface-hover"
+            "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer",
+            tab === "activity" ? "bg-jw-accent/15 text-jw-highlight border border-jw-accent/20" : "text-muted hover:bg-surface-hover"
           )}
         >
-          <Activity className="w-4 h-4" /> Activity Logs
+          <HiChartBar className="w-4 h-4" /> Activity Logs
         </button>
         <div className="flex-1" />
         <Button size="sm" variant="ghost" onClick={fetchLogs}>
-          <RefreshCw className="w-3.5 h-3.5" /> Refresh
+          <HiArrowPath className="w-3.5 h-3.5" /> Refresh
         </Button>
       </div>
 
       {/* Log table */}
-      <div className="bg-surface border border-surface-border rounded-2xl overflow-hidden">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+        className="glass-card rounded-2xl overflow-hidden"
+      >
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="text-xs text-muted font-medium border-b border-surface-border">
+              <tr className="text-xs text-muted font-semibold border-b border-surface-border uppercase tracking-wider">
                 <th className="text-left px-6 py-3">Time</th>
                 <th className="text-left px-6 py-3">User</th>
                 <th className="text-left px-6 py-3">Action</th>
@@ -105,7 +115,7 @@ export default function LogsPage() {
                 <th className="text-left px-6 py-3">IP</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-surface-border">
+            <tbody className="divide-y divide-surface-border/50">
               {loading ? (
                 <tr>
                   <td colSpan={tab === "activity" ? 6 : 5} className="px-6 py-8 text-center text-sm text-muted">Loading…</td>
@@ -116,11 +126,11 @@ export default function LogsPage() {
                 </tr>
               ) : (
                 logs.map((log) => (
-                  <tr key={log.id} className="hover:bg-surface-hover/50 transition-colors text-sm">
+                  <tr key={log.id} className="hover:bg-surface-hover/30 transition-colors text-sm">
                     <td className="px-6 py-3 text-xs text-muted whitespace-nowrap">{formatDateTime(log.created_at)}</td>
                     <td className="px-6 py-3 text-xs text-muted">{log.user_id?.slice(0, 8)}…</td>
                     <td className="px-6 py-3">
-                      <Badge className="bg-surface-hover text-foreground">{log.action}</Badge>
+                      <Badge className="bg-jw-accent/10 text-jw-accent border border-jw-accent/20">{log.action}</Badge>
                     </td>
                     {tab === "activity" && (
                       <td className="px-6 py-3 text-xs text-muted">{log.feature}</td>
@@ -130,7 +140,7 @@ export default function LogsPage() {
                     )}
                     {tab === "auth" && (
                       <td className="px-6 py-3">
-                        <span className={cn("text-xs font-medium", log.success ? "text-emerald-500" : "text-red-500")}>
+                        <span className={cn("text-xs font-semibold", log.success ? "text-emerald-400" : "text-red-400")}>
                           {log.success ? "Success" : "Failed"}
                         </span>
                       </td>
@@ -142,7 +152,7 @@ export default function LogsPage() {
             </tbody>
           </table>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

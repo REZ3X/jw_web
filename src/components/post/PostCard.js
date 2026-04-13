@@ -1,16 +1,22 @@
 "use client";
 
 /**
- * PostCard — single post in the feed.
+ * PostCard — single report/post in the feed.
  *
- * Displays user info, caption with parsed tags, media gallery,
- * vote buttons, comment count, and department/status badges.
- * Clicking the caption or comment icon opens the PostModal.
+ * Clean, minimal card design:
+ *  - Thin border, no heavy backgrounds
+ *  - Avatar · name · time on one line
+ *  - Caption (with clickable #tags)
+ *  - Media gallery
+ *  - Footer: vote | comments | location · department · status
  */
 
 import { useState } from "react";
 import Link from "next/link";
-import { MessageCircle, MapPin, Lock, MoreHorizontal, Trash2, Pencil, Pin } from "lucide-react";
+import {
+  HiChatBubbleOvalLeft, HiMapPin, HiLockClosed,
+  HiEllipsisHorizontal, HiTrash, HiPencilSquare
+} from "react-icons/hi2";
 import Avatar from "@/components/ui/Avatar";
 import Badge from "@/components/ui/Badge";
 import VoteButtons from "./VoteButtons";
@@ -19,6 +25,7 @@ import PostModal from "./PostModal";
 import Dropdown, { DropdownItem } from "@/components/ui/Dropdown";
 import { useAuthStore } from "@/lib/store";
 import { timeAgo, parseCaption, getDepartment, getStatus, cn, formatCount } from "@/lib/utils";
+import { GOV_ROLES } from "@/lib/constants";
 import { clientFetch } from "@/lib/api";
 import toast from "react-hot-toast";
 
@@ -33,6 +40,7 @@ export default function PostCard({ post, onDelete }) {
   const status = getStatus(post.status);
   const isOwner = user?.id === post.user_id;
   const caption = parseCaption(post.caption);
+  const isGov = GOV_ROLES.includes(post.user_role);
 
   const handleDelete = async () => {
     if (!confirm("Delete this post? This cannot be undone.")) return;
@@ -48,58 +56,68 @@ export default function PostCard({ post, onDelete }) {
 
   return (
     <>
-      <article className="bg-surface border border-surface-border rounded-2xl overflow-hidden hover:border-surface-border/80 transition-all animate-slide-up">
-        <div className="p-5">
-          {/* Header: user info + badges */}
-          <div className="flex items-start justify-between mb-3">
-            <div className="flex items-center gap-3">
-              <Link href={`/profile/${post.username}`}>
+      <article
+        className="rounded-xl bg-bg-card border border-border-default
+          hover:border-border-accent/50 transition-colors duration-200"
+      >
+        <div className="p-4 sm:p-5">
+          {/* ── Header ───────────────────────────── */}
+          <div className="flex items-start justify-between gap-2 mb-2.5">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <Link href={`/profile/${post.username}`} className="shrink-0">
                 <Avatar
                   src={post.user_avatar}
                   name={post.user_name}
-                  size="md"
-                  isGovernment={["city_major_gov", "fire_department", "health_department", "environment_department", "police_department"].includes(post.user_role)}
+                  size="sm"
+                  isGovernment={isGov}
                 />
               </Link>
-              <div>
-                <div className="flex items-center gap-2">
-                  <Link href={`/profile/${post.username}`} className="text-sm font-semibold hover:text-jw-primary transition-colors">
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <Link
+                    href={`/profile/${post.username}`}
+                    className="text-sm font-semibold text-text-primary hover:text-jw-mint transition-colors truncate"
+                  >
                     {post.user_name}
                   </Link>
+                  <span className="text-xs text-text-dim">·</span>
+                  <span className="text-xs text-text-muted">{timeAgo(post.created_at)}</span>
+                  {post.is_edited && <span className="text-xs text-text-dim">(edited)</span>}
                   {post.is_private && (
-                    <Lock className="w-3.5 h-3.5 text-muted-light" title="Private post" />
+                    <HiLockClosed className="w-3 h-3 text-text-dim" title="Private" />
                   )}
-                </div>
-                <div className="flex items-center gap-2 text-xs text-muted">
-                  <span>@{post.username}</span>
-                  <span>·</span>
-                  <span>{timeAgo(post.created_at)}</span>
-                  {post.is_edited && <span className="text-muted-light">(edited)</span>}
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <Badge className={status.color} dot={status.dotColor}>{status.label}</Badge>
+            {/* Right: status + menu */}
+            <div className="flex items-center gap-1.5 shrink-0">
+              <Badge className={status.color} dot={status.dotColor}>
+                {status.label}
+              </Badge>
               {isOwner && (
-                <Dropdown trigger={<MoreHorizontal className="w-5 h-5 text-muted hover:text-foreground transition-colors" />}>
+                <Dropdown
+                  trigger={
+                    <HiEllipsisHorizontal className="w-5 h-5 text-text-dim hover:text-text-secondary transition-colors cursor-pointer" />
+                  }
+                >
                   <DropdownItem onClick={() => setModalOpen(true)}>
-                    <Pencil className="w-4 h-4" /> Edit
+                    <HiPencilSquare className="w-4 h-4" /> Edit
                   </DropdownItem>
                   <DropdownItem danger onClick={handleDelete}>
-                    <Trash2 className="w-4 h-4" /> Delete
+                    <HiTrash className="w-4 h-4" /> Delete
                   </DropdownItem>
                 </Dropdown>
               )}
             </div>
           </div>
 
-          {/* Caption */}
+          {/* ── Caption ──────────────────────────── */}
           <button
             onClick={() => setModalOpen(true)}
             className="text-left w-full mb-3 cursor-pointer"
           >
-            <p className="text-[15px] leading-relaxed whitespace-pre-wrap">
+            <p className="text-[15px] leading-relaxed whitespace-pre-wrap text-text-primary/90">
               {caption.map((seg, i) =>
                 seg.type === "tag" ? (
                   <Link
@@ -117,43 +135,49 @@ export default function PostCard({ post, onDelete }) {
             </p>
           </button>
 
-          {/* Media */}
-          <div className="mb-3">
-            <MediaGallery media={post.media} />
-          </div>
+          {/* ── Media ────────────────────────────── */}
+          {post.media && post.media.length > 0 && (
+            <div className="mb-3 -mx-1">
+              <MediaGallery media={post.media} post={post} />
+            </div>
+          )}
 
-          {/* Meta: location + department */}
-          <div className="flex flex-wrap items-center gap-2 mb-3">
-            {post.location && (
-              <span className="inline-flex items-center gap-1 text-xs text-muted">
-                <MapPin className="w-3.5 h-3.5" />
-                {post.location}
-              </span>
-            )}
-            <Badge className={dept.color}>{dept.short}</Badge>
-          </div>
+          {/* ── Footer: vote + comment + meta ────── */}
+          <div className="flex items-center justify-between pt-2.5 border-t border-border-subtle">
+            {/* Left: vote + comments */}
+            <div className="flex items-center gap-2">
+              <VoteButtons
+                type="post"
+                id={post.id}
+                upvotes={post.upvote_count}
+                downvotes={post.downvote_count}
+                myVote={post.my_vote}
+              />
+              <button
+                onClick={() => setModalOpen(true)}
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg
+                  text-text-muted hover:text-jw-accent hover:bg-jw-accent/5
+                  transition-all duration-200 text-xs font-medium cursor-pointer"
+              >
+                <HiChatBubbleOvalLeft className="w-4 h-4" />
+                {formatCount(post.comment_count)}
+              </button>
+            </div>
 
-          {/* Actions: vote + comments */}
-          <div className="flex items-center gap-3 pt-2 border-t border-surface-border/50">
-            <VoteButtons
-              type="post"
-              id={post.id}
-              upvotes={post.upvote_count}
-              downvotes={post.downvote_count}
-              myVote={post.my_vote}
-            />
-            <button
-              onClick={() => setModalOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-muted hover:text-jw-primary hover:bg-jw-primary/5 transition-colors text-sm cursor-pointer"
-            >
-              <MessageCircle className="w-4.5 h-4.5" />
-              <span className="font-medium">{formatCount(post.comment_count)}</span>
-            </button>
+            {/* Right: location + department */}
+            <div className="flex items-center gap-2">
+              {post.location && (
+                <span className="hidden sm:inline-flex items-center gap-1 text-[11px] text-text-dim">
+                  <HiMapPin className="w-3 h-3 text-jw-accent/60" />
+                  <span className="truncate max-w-[120px]">{post.location}</span>
+                </span>
+              )}
+              <Badge className={dept.color}>{dept.short}</Badge>
+            </div>
           </div>
         </div>
       </article>
 
-      {/* Post modal overlay */}
       {modalOpen && (
         <PostModal post={post} onClose={() => setModalOpen(false)} />
       )}

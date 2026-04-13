@@ -1,61 +1,63 @@
 "use client";
 
 /**
- * Dropdown menu component.
- * Opens on click, closes on outside click or Escape.
+ * Dropdown menu with framer-motion.
  */
 
 import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Dropdown({ trigger, children, align = "right", className }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
   useEffect(() => {
-    function handleClickOutside(e) {
+    const close = (e) => {
       if (ref.current && !ref.current.contains(e.target)) setOpen(false);
-    }
-    function handleEsc(e) {
-      if (e.key === "Escape") setOpen(false);
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleEsc);
+    };
+    const esc = (e) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("mousedown", close);
+    document.addEventListener("keydown", esc);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEsc);
+      document.removeEventListener("mousedown", close);
+      document.removeEventListener("keydown", esc);
     };
   }, []);
 
   return (
     <div ref={ref} className={cn("relative", className)}>
-      <div onClick={() => setOpen(!open)} className="cursor-pointer">
-        {trigger}
-      </div>
-      {open && (
-        <div
-          className={cn(
-            "absolute top-full mt-2 min-w-[180px] bg-surface border border-surface-border rounded-xl shadow-xl z-50 py-1.5 animate-slide-down",
-            align === "right" ? "right-0" : "left-0"
-          )}
-          onClick={() => setOpen(false)}
-        >
-          {children}
-        </div>
-      )}
+      <div onClick={() => setOpen(!open)} className="cursor-pointer">{trigger}</div>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -6, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -6, scale: 0.96 }}
+            transition={{ duration: 0.12 }}
+            className={cn(
+              "absolute top-full mt-1.5 min-w-[180px] z-50 py-1",
+              "rounded-xl bg-bg-elevated border border-border-default shadow-xl shadow-black/40",
+              align === "right" ? "right-0" : "left-0"
+            )}
+            onClick={() => setOpen(false)}
+          >
+            {children}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
 
-/** Dropdown menu item */
 export function DropdownItem({ children, className, danger, ...props }) {
   return (
     <button
       className={cn(
-        "w-full flex items-center gap-2.5 px-4 py-2 text-sm text-left transition-colors cursor-pointer",
+        "w-full flex items-center gap-2 px-3.5 py-2 text-sm text-left transition-colors duration-150 cursor-pointer",
         danger
-          ? "text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20"
-          : "text-foreground hover:bg-surface-hover",
+          ? "text-danger hover:bg-danger/10"
+          : "text-text-primary hover:bg-bg-card-hover hover:text-jw-mint",
         className
       )}
       {...props}
