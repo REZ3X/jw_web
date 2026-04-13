@@ -18,7 +18,6 @@ const SIZES = {
   "2xl": "w-24 h-24 text-2xl",
 };
 
-/** Size-dependent border radius for squircle look */
 const RADIUS = {
   xs: "rounded-md",
   sm: "rounded-lg",
@@ -39,7 +38,7 @@ export default function Avatar({ src, name, size = "md", isGovernment = false, c
         className={cn(
           SIZES[size],
           RADIUS[size] || "rounded-xl",
-          "overflow-hidden flex items-center justify-center font-bold",
+          "relative overflow-hidden flex items-center justify-center font-bold",
           src
             ? "ring-1 ring-border-subtle"
             : "bg-jw-secondary text-jw-mint/80 ring-1 ring-jw-accent/20"

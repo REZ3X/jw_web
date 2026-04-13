@@ -461,6 +461,7 @@ export default function HomeFeed({ initialPosts, isNewUser }) {
   const currentStatusLabel = status ? POST_STATUS[status]?.label : null;
 
   return (
+    <>
     <div className="feed-layout">
       {/* ═══ Feed column ═══ */}
       <div className="feed-column">
@@ -595,25 +596,32 @@ export default function HomeFeed({ initialPosts, isNewUser }) {
 
       {/* ═══ Right Sidebar (xl+ only) ═══ */}
       <RightSidebar />
-
-      {/* ─── Mobile FAB ────────────────────────────── */}
-      {loaded && user && !user.is_government && (
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.92 }}
-          onClick={openCreateModal}
-          className="fixed bottom-6 right-6 z-30 xl:hidden
-            w-14 h-14 rounded-2xl gradient-btn
-            shadow-lg shadow-jw-accent/20
-            flex items-center justify-center cursor-pointer
-            animate-glow-pulse"
-          title="Create Report"
-        >
-          <HiPlus className="w-6 h-6 text-white" />
-        </motion.button>
-      )}
-
-
     </div>
+
+    {/* ─── Mobile FAB ────────────────────────────── */}
+    {loaded && user && !user.is_government && (
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.92 }}
+        onClick={openCreateModal}
+        className="fixed bottom-24 right-5 z-30 xl:hidden md:bottom-6
+          w-14 h-14 rounded-2xl overflow-hidden
+          bg-jw-secondary/[0.55] backdrop-blur-md
+          border border-jw-accent/[0.18]
+          shadow-[0_8px_32px_-6px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(176,228,204,0.1)]
+          flex items-center justify-center cursor-pointer"
+        title="Create Report"
+      >
+        {/* Liquid glass refraction */}
+        <div className="absolute inset-0 rounded-2xl
+          bg-gradient-to-br from-jw-mint/[0.08] via-transparent to-jw-accent/[0.06]
+          pointer-events-none" />
+        <div className="absolute top-0 left-2 right-2 h-[1px]
+          bg-gradient-to-r from-transparent via-jw-mint/25 to-transparent
+          pointer-events-none" />
+        <HiPlus className="w-6 h-6 text-jw-mint relative z-10 drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]" />
+      </motion.button>
+    )}
+  </>
   );
 }

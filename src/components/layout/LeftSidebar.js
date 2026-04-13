@@ -21,7 +21,7 @@ import {
   HiHome, HiGlobeAlt, HiChatBubbleLeftRight,
   HiUser, HiSquares2X2, HiShieldCheck,
   HiCog6Tooth, HiArrowRightOnRectangle,
-  HiPlusCircle, HiBookOpen
+  HiPlusCircle, HiBookOpen, HiVideoCamera
 } from "react-icons/hi2";
 import Avatar from "@/components/ui/Avatar";
 import { useAuthStore } from "@/lib/store";
@@ -88,6 +88,7 @@ export default function LeftSidebar() {
       <nav className="px-3 space-y-0.5 mt-2">
         <NavLink href="/" icon={HiHome} label="Home" active={isActive("/")} />
         <NavLink href="/explore" icon={HiGlobeAlt} label="Explore" active={isActive("/explore")} />
+        <NavLink href="/cctv" icon={HiVideoCamera} label="CCTV Map" active={isActive("/cctv")} />
         {loaded && user && (
           <NavLink href="/chat" icon={HiChatBubbleLeftRight} label="AI Chat" active={isActive("/chat")} />
         )}

@@ -38,6 +38,9 @@ export default function PostModal({ post, onClose }) {
     document.addEventListener("keydown", handleEsc);
     document.body.style.overflow = "hidden";
 
+    // Signal Navbar to hide bars
+    window.dispatchEvent(new CustomEvent("jw:overlay-open"));
+
     // Push /post/{id} — refreshing at this URL loads the real post page
     window.history.pushState({ postModal: true }, "", `/post/${post.id}`);
 
@@ -51,6 +54,8 @@ export default function PostModal({ post, onClose }) {
       document.removeEventListener("keydown", handleEsc);
       document.body.style.overflow = "";
       window.removeEventListener("popstate", handlePopState);
+      // Signal Navbar to show bars
+      window.dispatchEvent(new CustomEvent("jw:overlay-close"));
       // Restore the original URL without firing popstate (replaceState is silent)
       if (window.location.pathname === `/post/${post.id}`) {
         window.history.replaceState(null, "", originalUrl);

@@ -313,9 +313,11 @@ export default function ImageLightbox({ images, initialIndex = 0, onClose, post 
     };
     document.addEventListener("keydown", handleKey);
     document.body.style.overflow = "hidden";
+    window.dispatchEvent(new CustomEvent("jw:overlay-open"));
     return () => {
       document.removeEventListener("keydown", handleKey);
       document.body.style.overflow = "";
+      window.dispatchEvent(new CustomEvent("jw:overlay-close"));
     };
   }, [onClose, paginate]);
 

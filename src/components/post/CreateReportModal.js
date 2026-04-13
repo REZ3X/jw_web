@@ -51,9 +51,11 @@ export default function CreateReportModal() {
     const handler = (e) => { if (e.key === "Escape") setOpen(false); };
     document.addEventListener("keydown", handler);
     document.body.style.overflow = "hidden";
+    window.dispatchEvent(new CustomEvent("jw:overlay-open"));
     return () => {
       document.removeEventListener("keydown", handler);
       document.body.style.overflow = "";
+      window.dispatchEvent(new CustomEvent("jw:overlay-close"));
     };
   }, [open]);
 
