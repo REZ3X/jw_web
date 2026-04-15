@@ -55,7 +55,7 @@ function TrendingHero({ tags, loading, onTagClick }) {
       {/* Header */}
       <div className="px-4 py-3 border-b border-border-subtle flex items-center gap-2">
         <HiArrowTrendingUp className="w-4 h-4 text-jw-accent" />
-        <h2 className="text-sm font-bold text-text-primary">Trending in JogjaWaskita</h2>
+        <h2 className="text-sm font-bold text-text-primary">Lagi Trending di JogjaWaskita</h2>
       </div>
 
       {/* Tag list */}
@@ -79,7 +79,7 @@ function TrendingHero({ tags, loading, onTagClick }) {
                 {tag.tag}
               </p>
               <p className="text-[11px] text-text-dim mt-0.5">
-                {formatCount(tag.count)} {tag.count === 1 ? "post" : "posts"}
+                {formatCount(tag.count)} {tag.count === 1 ? "laporan" : "laporan"}
               </p>
             </div>
             <HiChevronRight className="w-4 h-4 text-text-dim group-hover:text-text-muted mt-3 shrink-0 transition-colors" />
@@ -182,7 +182,7 @@ function ExploreContent() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={tab === "users" ? "Search by name or username…" : "Search reports, tags, locations…"}
+            placeholder={tab === "users" ? "Cari berdasarkan nama atau username..." : "Cari laporan, tag, lokasi..."}
             className="w-full pl-12 pr-10 py-3 bg-bg-card border border-border-default rounded-xl text-sm
               text-text-primary placeholder:text-text-dim
               focus:outline-none focus:ring-2 focus:ring-jw-accent/30 focus:border-jw-accent/40
@@ -210,7 +210,7 @@ function ExploreContent() {
                 : "text-text-muted hover:text-text-secondary hover:bg-bg-card-hover"
             )}
           >
-            <HiDocumentText className="w-4 h-4" /> Reports
+            <HiDocumentText className="w-4 h-4" /> Laporan
             {tab === "posts" && (
               <motion.div
                 layoutId="explore-tab-underline"
@@ -228,7 +228,7 @@ function ExploreContent() {
                 : "text-text-muted hover:text-text-secondary hover:bg-bg-card-hover"
             )}
           >
-            <HiUsers className="w-4 h-4" /> People
+            <HiUsers className="w-4 h-4" /> Warga
             {tab === "users" && (
               <motion.div
                 layoutId="explore-tab-underline"
@@ -275,10 +275,10 @@ function ExploreContent() {
             )}
 
             {!usersLoading && users.length === 0 && searchQuery.trim() && (
-              <EmptyState icon={HiUsers} title="No users found" description="Try a different name or username" />
+              <EmptyState icon={HiUsers} title="Warga nggak ketemu" description="Coba nama atau username yang lain" />
             )}
             {!usersLoading && users.length === 0 && !searchQuery.trim() && (
-              <EmptyState icon={HiUsers} title="Search for people" description="Type a name or username above" />
+              <EmptyState icon={HiUsers} title="Cari warga" description="Ketik nama atau username di atas" />
             )}
 
             {users.map((u) => {
@@ -303,7 +303,7 @@ function ExploreContent() {
                       <div className="flex items-center gap-1.5">
                         <p className="text-sm font-semibold text-text-primary group-hover:text-jw-mint transition-colors truncate">
                           {u.name}
-                          {isOwn && <span className="text-xs font-normal text-text-dim ml-1">(you)</span>}
+                          {isOwn && <span className="text-xs font-normal text-text-dim ml-1">(kamu)</span>}
                         </p>
                         <span className={cn("text-[10px] px-1.5 py-0.5 rounded font-semibold shrink-0", role.color)}>
                           {role.label}
@@ -333,7 +333,7 @@ function ExploreContent() {
 
             {/* Posts section label */}
             <SectionLabel icon={HiFire}>
-              {activeTag ? `Posts tagged #${activeTag}` : searchQuery ? "Search results" : "Top Posts"}
+              {activeTag ? `Laporan dengan tag #${activeTag}` : searchQuery ? "Hasil pencarian" : "Laporan Terpopuler"}
             </SectionLabel>
 
             {/* Post cards */}
@@ -363,8 +363,8 @@ function ExploreContent() {
             {!loading && posts.length === 0 && (
               <EmptyState
                 icon={HiDocumentText}
-                title="No results"
-                description={activeTag ? `No posts found with tag #${activeTag}` : "Try adjusting your search"}
+                title="Nggak ada hasil"
+                description={activeTag ? `Nggak ada laporan dengan tag #${activeTag}` : "Coba ubah kata kuncinya"}
               />
             )}
 
@@ -374,13 +374,13 @@ function ExploreContent() {
                 onClick={() => { const n = page + 1; setPage(n); fetchPosts(n, true); }}
                 className="w-full py-3 mt-4 text-sm text-jw-accent font-semibold hover:bg-jw-accent/5 rounded-xl transition-all duration-200 cursor-pointer"
               >
-                Load more
+                Muat lebih banyak
               </button>
             )}
 
             {!loading && !hasMore && posts.length > 0 && (
               <p className="text-center text-xs text-text-dim py-10 select-none">
-                — End of results —
+                — Udah mentok, nggak ada lagi —
               </p>
             )}
           </>
@@ -399,11 +399,11 @@ function ExploreContent() {
           className="px-1"
         >
           <div className="flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-text-dim">
-            <Link href="/" className="hover:text-text-muted transition-colors">Home</Link>
-            <Link href="/chat" className="hover:text-text-muted transition-colors">AI Chat</Link>
+            <Link href="/" className="hover:text-text-muted transition-colors">Beranda</Link>
+            <Link href="/chat" className="hover:text-text-muted transition-colors">Tanya AI</Link>
           </div>
           <p className="text-[10px] text-text-dim/60 mt-2">
-            © 2026 JogjaWaskita. All rights reserved.
+            © 2026 JogjaWaskita. Hak Cipta Dilindungi.
           </p>
         </motion.div>
       </aside>

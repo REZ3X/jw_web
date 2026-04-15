@@ -5,13 +5,13 @@
  *
  * X/Twitter-style layout:
  *  ┌──────────────────────────────────────────────────────────────────┐
- *  │ LeftSidebar (from layout) │   Feed Column    │  RightSidebar    │
- *  │         240px (lg+)       │  max-w-[600px]   │   300px (xl+)    │
- *  │  ─ Brand                  │  ─ Header bar    │  ─ Search        │
- *  │  ─ Nav links              │  ─ Create prompt │  ─ Trending      │
- *  │  ─ Tools                  │  ─ Post cards    │  ─ Active Users  │
- *  │  ─ Create CTA             │  ─ Infinite load │  ─ Footer        │
- *  │  ─ User card              │                  │                  │
+ *  │ LeftSidebar (from layout) │   Feed Column    │  RightSidebar     │
+ *  │         240px (lg+)       │  max-w-[600px]   │   300px (xl+)     │
+ *  │  ─ Brand                  │  ─ Header bar    │  ─ Search         │
+ *  │  ─ Nav links              │  ─ Create prompt │  ─ Trending       │
+ *  │  ─ Tools                  │  ─ Post cards    │  ─ Active Users   │
+ *  │  ─ Create CTA             │  ─ Infinite load │  ─ Footer         │
+ *  │  ─ User card              │                  │                   │
  *  └──────────────────────────────────────────────────────────────────┘
  */
 
@@ -110,7 +110,7 @@ function FeedSettings({
             <div className="flex items-center justify-between px-3 py-2 border-b border-border-subtle">
               <span className="text-xs font-bold text-text-secondary flex items-center gap-1.5">
                 <HiAdjustmentsHorizontal className="w-3.5 h-3.5 text-jw-accent" />
-                Feed Settings
+                Pengaturan Feed
               </span>
               {hasFilters && (
                 <button
@@ -125,7 +125,7 @@ function FeedSettings({
             <div className="p-3 space-y-3">
               {/* Sort */}
               <div>
-                <p className="text-[9px] font-bold text-text-dim uppercase tracking-widest mb-1.5">Sort by</p>
+                <p className="text-[9px] font-bold text-text-dim uppercase tracking-widest mb-1.5">Urutkan</p>
                 <div className="space-y-0.5">
                   {POST_SORT_OPTIONS.map((opt) => {
                     const Icon = SORT_ICONS[opt.value] || HiClock;
@@ -152,7 +152,7 @@ function FeedSettings({
 
               {/* Department */}
               <div>
-                <p className="text-[9px] font-bold text-text-dim uppercase tracking-widest mb-1.5">Department</p>
+                <p className="text-[9px] font-bold text-text-dim uppercase tracking-widest mb-1.5">Dinas</p>
                 <div className="flex flex-wrap gap-1">
                   <button
                     onClick={() => onDepartmentChange("")}
@@ -242,7 +242,7 @@ function FeedSettings({
             <div className="flex items-center justify-between px-4 py-2 border-b border-border-subtle">
               <h3 className="text-sm font-bold text-text-primary flex items-center gap-2">
                 <HiAdjustmentsHorizontal className="w-4 h-4 text-jw-accent" />
-                Feed Settings
+                Pengaturan Feed
               </h3>
               <div className="flex items-center gap-3">
                 {hasFilters && (
@@ -265,7 +265,7 @@ function FeedSettings({
             <div className="p-4 space-y-4 overflow-y-auto flex-1">
               {/* Sort */}
               <div>
-                <p className="text-[10px] font-bold text-text-dim uppercase tracking-widest mb-2">Sort by</p>
+                <p className="text-[10px] font-bold text-text-dim uppercase tracking-widest mb-2">Urutkan</p>
                 <div className="space-y-0.5">
                   {POST_SORT_OPTIONS.map((opt) => {
                     const Icon = SORT_ICONS[opt.value] || HiClock;
@@ -292,7 +292,7 @@ function FeedSettings({
 
               {/* Department */}
               <div>
-                <p className="text-[10px] font-bold text-text-dim uppercase tracking-widest mb-2">Department</p>
+                <p className="text-[10px] font-bold text-text-dim uppercase tracking-widest mb-2">Dinas</p>
                 <div className="flex flex-wrap gap-1.5">
                   <button
                     onClick={() => onDepartmentChange("")}
@@ -362,7 +362,7 @@ function FeedSettings({
                 onClick={onClose}
                 className="w-full py-2.5 rounded-xl gradient-btn text-sm font-semibold cursor-pointer"
               >
-                Done
+                Selesai
               </button>
             </div>
           </motion.div>
@@ -423,7 +423,7 @@ export default function HomeFeed({ initialPosts, isNewUser }) {
 
   useEffect(() => {
     if (isNewUser) {
-      toast.success("Welcome to JogjaWaskita! Check your inbox to verify your email.", {
+      toast.success("Selamat datang di JogjaWaskita! Cek inbox email kamu buat verifikasi ya.", {
         duration: 8000, position: "top-center",
       });
       window.history.replaceState({}, document.title, window.location.pathname);
@@ -469,7 +469,7 @@ export default function HomeFeed({ initialPosts, isNewUser }) {
         {/* ─── Feed header ─────────────────────────────── */}
         <div className="flex items-center justify-between mb-4 relative">
           <div className="flex items-center gap-2 min-w-0">
-            <h1 className="text-base font-bold text-text-primary">Home</h1>
+            <h1 className="text-base font-bold text-text-primary">Beranda</h1>
             {/* Active filter badges */}
             {activeFilterCount > 0 && (
               <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
@@ -501,7 +501,7 @@ export default function HomeFeed({ initialPosts, isNewUser }) {
                 ? "bg-jw-accent/15 text-jw-mint"
                 : "text-text-muted hover:text-text-primary hover:bg-bg-card-hover"
             )}
-            title="Feed settings"
+            title="Pengaturan feed"
           >
             <HiAdjustmentsHorizontal className="w-5 h-5" />
             {/* Filter count badge */}
@@ -543,7 +543,7 @@ export default function HomeFeed({ initialPosts, isNewUser }) {
             >
               <Avatar src={user.avatar_url} name={user.name} size="sm" />
               <span className="flex-1 text-left text-sm text-text-muted group-hover:text-text-secondary transition-colors">
-                What&apos;s happening in your community?
+                Ada kejadian apa nih di sekitarmu?
               </span>
               <HiPhoto className="w-5 h-5 text-text-dim group-hover:text-jw-accent transition-colors" />
             </button>
@@ -579,15 +579,15 @@ export default function HomeFeed({ initialPosts, isNewUser }) {
         {!loading && posts.length === 0 && (
           <EmptyState
             icon={HiDocumentText}
-            title="No reports yet"
-            description="Be the first to report a community issue"
+            title="Belum ada laporan nih"
+            description="Jadilah yang pertama laporin masalah di sekitarmu"
           />
         )}
 
         {/* End of feed */}
         {!loading && !hasMore && posts.length > 0 && (
           <p className="text-center text-xs text-text-dim py-10 select-none">
-            — You&apos;ve seen it all —
+            — Udah mentok, nggak ada lagi —
           </p>
         )}
 
@@ -610,7 +610,7 @@ export default function HomeFeed({ initialPosts, isNewUser }) {
           border border-jw-accent/[0.18]
           shadow-[0_8px_32px_-6px_rgba(0,0,0,0.45),inset_0_1px_0_0_rgba(176,228,204,0.1)]
           flex items-center justify-center cursor-pointer"
-        title="Create Report"
+        title="Buat Laporan"
       >
         {/* Liquid glass refraction */}
         <div className="absolute inset-0 rounded-2xl

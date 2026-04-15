@@ -86,11 +86,11 @@ export default function LeftSidebar() {
 
       {/* ─── Main nav ────────────────────── */}
       <nav className="px-3 space-y-0.5 mt-2">
-        <NavLink href="/" icon={HiHome} label="Home" active={isActive("/")} />
+        <NavLink href="/" icon={HiHome} label="Beranda" active={isActive("/")} />
         <NavLink href="/explore" icon={HiGlobeAlt} label="Explore" active={isActive("/explore")} />
-        <NavLink href="/cctv" icon={HiVideoCamera} label="CCTV Map" active={isActive("/cctv")} />
+        <NavLink href="/cctv" icon={HiVideoCamera} label="Pantau CCTV" active={isActive("/cctv")} />
         {loaded && user && (
-          <NavLink href="/chat" icon={HiChatBubbleLeftRight} label="AI Chat" active={isActive("/chat")} />
+          <NavLink href="/chat" icon={HiChatBubbleLeftRight} label="Tanya AI" active={isActive("/chat")} />
         )}
       </nav>
 
@@ -125,7 +125,7 @@ export default function LeftSidebar() {
               shadow-lg shadow-jw-accent/10 hover:shadow-jw-accent/20 transition-shadow duration-300"
           >
             <HiPlusCircle className="w-5 h-5" />
-            Create Report
+            Buat Laporan
           </Link>
         </div>
       )}
@@ -150,13 +150,13 @@ export default function LeftSidebar() {
                 href="/profile/settings"
                 className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-[11px] font-semibold text-text-muted hover:text-text-primary hover:bg-bg-card-hover transition-colors"
               >
-                <HiCog6Tooth className="w-3.5 h-3.5" /> Settings
+                <HiCog6Tooth className="w-3.5 h-3.5" /> Pengaturan
               </Link>
               <button
                 onClick={handleLogout}
                 className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-[11px] font-semibold text-text-muted hover:text-danger hover:bg-danger/5 transition-colors cursor-pointer"
               >
-                <HiArrowRightOnRectangle className="w-3.5 h-3.5" /> Log out
+                <HiArrowRightOnRectangle className="w-3.5 h-3.5" /> Keluar
               </button>
             </div>
           </div>
@@ -171,7 +171,7 @@ export default function LeftSidebar() {
             className="flex items-center justify-center w-full py-3 rounded-xl gradient-btn text-sm font-semibold
               shadow-lg shadow-jw-accent/10"
           >
-            Join Now
+            Ayo Gabung
           </Link>
         </div>
       )}

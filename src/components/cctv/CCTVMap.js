@@ -41,7 +41,6 @@ function createCCTVIcon() {
             <path d="M20.916 9.564a.998.998 0 0 0-.513-1.42L7.084 4.01a.999.999 0 0 0-1.318.71L4.002 12.078a1 1 0 0 0 .71 1.318l3.959 1.399-1.379 1.835a1 1 0 0 0 .2 1.4l.5.375a1 1 0 0 0 1.4-.2l1.376-1.834 3.963 1.401a1 1 0 0 0 1.318-.71l.553-2.084 1.007.483a2.003 2.003 0 0 0 2.693-.985l.399-.83a2.002 2.002 0 0 0-.985-2.693l-.8-.39zM10.964 11.455a1.5 1.5 0 1 1 .536-2.053 1.502 1.502 0 0 1-.536 2.053zM7 20h10v2H7z"/>
           </svg>
         </div>
-        <div class="cctv-pin-pulse"></div>
       </div>
     `,
     iconSize: [44, 44],
@@ -143,7 +142,7 @@ export default function CCTVMap({ cameras, onSelectCCTV, selectedId, lightTheme 
                 className="cctv-popup-btn"
                 onClick={() => onSelectCCTV(cam)}
               >
-                ▶ Watch Live
+                ▶ Liat Live
               </button>
             </div>
           </Popup>

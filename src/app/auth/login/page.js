@@ -35,10 +35,10 @@ function LoginContent() {
   };
 
   const features = [
-    { icon: HiShieldCheck, title: "Report Issues", desc: "Share problems in your community with photos and location" },
-    { icon: HiArrowTrendingUp, title: "Track Resolution", desc: "Follow the progress from report to resolution" },
-    { icon: HiChatBubbleLeftRight, title: "AI Assistant", desc: "Get help drafting reports with our smart AI chat" },
-    { icon: HiUsers, title: "Community Voice", desc: "Upvote issues that matter — most urgent rises to top" },
+    { icon: HiShieldCheck, title: "Lapor Masalah", desc: "Kasih tau masalah di sekitarmu pake foto & lokasi" },
+    { icon: HiArrowTrendingUp, title: "Pantau Progres", desc: "Pantau terus dari lapor sampe beres" },
+    { icon: HiChatBubbleLeftRight, title: "Tanya AI", desc: "AI pinter siap bantu kamu bikin laporan" },
+    { icon: HiUsers, title: "Suara Warga", desc: "Upvote laporan penting, makin genting makin di atas" },
   ];
 
   return (
@@ -65,17 +65,17 @@ function LoginContent() {
               <h1 className="text-3xl font-bold gradient-text">
                 JogjaWaskita
               </h1>
-              <p className="text-sm text-muted">Civic Engagement Platform</p>
+              <p className="text-sm text-muted">Platform Warga Jogja</p>
             </div>
           </div>
 
           <h2 className="text-2xl lg:text-3xl font-bold mb-3 leading-tight text-foreground">
-            Your voice, your city.
+            Suaramu buat kotamu.
             <br />
-            <span className="gradient-text">Make it better, together.</span>
+            <span className="gradient-text">Bikin lebih baik, bareng-bareng.</span>
           </h2>
           <p className="text-muted mb-8 max-w-md mx-auto lg:mx-0">
-            Report community issues, track government responses, and hold departments accountable — all in one transparent platform.
+            Laporin masalah warga, pantau respon pemerintah, & awasi bareng dinas terkait. Semuanya transparan di satu wadah.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-lg mx-auto lg:mx-0">
@@ -108,16 +108,16 @@ function LoginContent() {
         >
           <div className="glass-card rounded-3xl p-8 shadow-2xl shadow-black/30 animate-glow-pulse">
             <div className="text-center mb-6">
-              <h3 className="text-xl font-bold text-foreground mb-1">Welcome</h3>
-              <p className="text-sm text-muted">Sign in to start making a difference</p>
+              <h3 className="text-xl font-bold text-foreground mb-1">Halo!</h3>
+              <p className="text-sm text-muted">Login yuk buat mulai ikutan ngawasin & ngebantu bikin Jogja lebih baik.</p>
             </div>
 
             {/* Error message */}
             {error && (
               <div className="mb-4 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm text-red-400">
-                {error === "missing_code" && "Authentication failed: missing authorization code."}
-                {error === "auth_failed" && "Authentication failed. Please try again."}
-                {error === "server_error" && "A server error occurred. Please try again later."}
+                {error === "missing_code" && "Gagal login: kode akses ilang."}
+                {error === "auth_failed" && "Gagal login nih. Coba lagi ya."}
+                {error === "server_error" && "Server lagi error. Nanti dicoba lagi aja."}
               </div>
             )}
 
@@ -132,26 +132,26 @@ function LoginContent() {
               ) : (
                 <FcGoogle className="w-5 h-5" />
               )}
-              Continue with Google
+              Lanjut pake Google
             </button>
 
             <p className="text-xs text-muted text-center mt-6">
-              By signing in, you agree to use this platform responsibly and help build a better community.
+              Gabung berarti kamu janji mau pake ini baik-baik & ikutan bangun kota.
             </p>
 
             {/* Trust indicators */}
             <div className="flex items-center justify-center gap-4 mt-6 pt-6 border-t border-surface-border">
               <div className="flex items-center gap-1 text-xs text-muted">
                 <HiCheckCircle className="w-3.5 h-3.5 text-emerald-400" />
-                Secure
+                Aman
               </div>
               <div className="flex items-center gap-1 text-xs text-muted">
                 <HiCheckCircle className="w-3.5 h-3.5 text-emerald-400" />
-                Private
+                Privasi Terjaga
               </div>
               <div className="flex items-center gap-1 text-xs text-muted">
                 <HiCheckCircle className="w-3.5 h-3.5 text-emerald-400" />
-                Free
+                Gratis
               </div>
             </div>
           </div>
