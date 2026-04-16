@@ -33,7 +33,7 @@ export default function Avatar({ src, name, size = "md", isGovernment = false, c
     : "?";
 
   return (
-    <div className={cn("relative shrink-0", className)}>
+    <div className={cn("relative shrink-0", RADIUS[size] || "rounded-xl", className)}>
       <div
         className={cn(
           SIZES[size],

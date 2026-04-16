@@ -357,10 +357,10 @@ function FeedSettings({
             </div>
 
             {/* Apply button */}
-            <div className="border-t border-border-subtle p-3">
+            <div className="border-t border-border-subtle p-4 pb-28">
               <button
                 onClick={onClose}
-                className="w-full py-2.5 rounded-xl gradient-btn text-sm font-semibold cursor-pointer"
+                className="w-full py-3 rounded-xl gradient-btn text-sm font-semibold cursor-pointer shadow-lg shadow-jw-accent/20"
               >
                 Selesai
               </button>
