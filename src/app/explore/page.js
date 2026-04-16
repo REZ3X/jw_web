@@ -110,6 +110,7 @@ function ExploreContent() {
 
   const [tab, setTab] = useState("posts");
   const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
+  const [debouncedSearch, setDebouncedSearch] = useState(searchQuery);
   const [activeTag, setActiveTag] = useState(searchParams.get("tag") || "");
   const [sort] = useState("most_upvoted");
   const [posts, setPosts] = useState([]);
@@ -122,6 +123,11 @@ function ExploreContent() {
   const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchQuery), 400);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  useEffect(() => {
     clientFetch("/api/analytics/trending-tags")
       .then((res) => setTrendingTags(res?.data?.trending_tags || []))
       .catch(() => {})
@@ -132,7 +138,7 @@ function ExploreContent() {
     setLoading(true);
     try {
       const qs = buildQuery({
-        search: searchQuery, tag: activeTag,
+        search: debouncedSearch, tag: activeTag,
         sort, page: p, per_page: 15,
       });
       const res = await clientFetch(`/api/posts${qs}`);
@@ -141,26 +147,35 @@ function ExploreContent() {
       setHasMore(newPosts.length >= 15);
     } catch { setHasMore(false); }
     setLoading(false);
-  }, [searchQuery, activeTag, sort]);
+  }, [debouncedSearch, activeTag, sort]);
 
-  useEffect(() => { setPage(1); fetchPosts(1); }, [fetchPosts]);
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setPage(1);
-    if (tab === "users") searchUsersQuery();
-    else fetchPosts(1);
-  };
+  useEffect(() => { 
+    if (tab === "posts") {
+      setPage(1); 
+      fetchPosts(1); 
+    }
+  }, [fetchPosts, tab]);
 
   const searchUsersQuery = useCallback(async () => {
-    if (!searchQuery.trim()) { setUsers([]); return; }
+    if (!debouncedSearch.trim()) { setUsers([]); return; }
     setUsersLoading(true);
     try {
-      const res = await clientFetch(`/api/users/search?q=${encodeURIComponent(searchQuery)}&limit=20`);
+      const res = await clientFetch(`/api/users/search?q=${encodeURIComponent(debouncedSearch)}&limit=20`);
       setUsers(res?.data || []);
     } catch { setUsers([]); }
     setUsersLoading(false);
-  }, [searchQuery]);
+  }, [debouncedSearch]);
+
+  useEffect(() => {
+    if (tab === "users") {
+      searchUsersQuery();
+    }
+  }, [searchUsersQuery, tab]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setDebouncedSearch(searchQuery);
+  };
 
   const handleTagClick = (tag) => {
     setActiveTag(activeTag === tag ? "" : tag);
@@ -220,7 +235,7 @@ function ExploreContent() {
             )}
           </button>
           <button
-            onClick={() => { setTab("users"); if (searchQuery.trim()) searchUsersQuery(); }}
+            onClick={() => setTab("users")}
             className={cn(
               "flex items-center justify-center gap-1.5 flex-1 py-3 text-sm font-semibold transition-all duration-200 cursor-pointer relative",
               tab === "users"
