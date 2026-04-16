@@ -42,7 +42,7 @@ function LoginContent() {
   ];
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-12">
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 pt-12 pb-32 md:py-12">
       <div className="w-full max-w-4xl flex flex-col lg:flex-row gap-8 items-center">
         {/* Left: branding + features */}
         <motion.div
