@@ -212,7 +212,7 @@ function SuggestedGovWidget() {
         const data = res?.data || [];
         const govUsers = data.filter((u) => u.is_government);
         const shuffled = govUsers.sort(() => 0.5 - Math.random());
-        setUsers(shuffled.slice(0, 3));
+        setUsers(shuffled);
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -253,14 +253,6 @@ function SuggestedGovWidget() {
           );
         })}
       </div>
-      <Link
-        href="/explore?tab=users"
-        className="flex items-center justify-center gap-1 px-4 py-2.5
-          text-xs font-semibold text-jw-accent hover:text-jw-mint
-          border-t border-border-subtle transition-colors"
-      >
-        Lihat semua instansi <HiArrowRight className="w-3 h-3" />
-      </Link>
     </SidebarSection>
   );
 }
