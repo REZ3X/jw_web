@@ -67,7 +67,7 @@ function CategoryChips({ categories, categoryFilter, setCategoryFilter }) {
             : "text-text-dim hover:text-text-muted bg-bg-inset border border-transparent"
         )}
       >
-        All
+        Semua
       </button>
       {categories.map((cat) => (
         <button
@@ -132,8 +132,8 @@ export default function CCTVPanel({ cameras, selectedId, onSelect, lightMap, set
         <div className="px-4 py-3.5 border-b border-border-subtle">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-sm font-bold text-text-primary mb-0.5">CCTV Cameras</h2>
-              <p className="text-[11px] text-text-dim">{cameras.length} cameras • {filtered.length} shown</p>
+              <h2 className="text-sm font-bold text-text-primary mb-0.5">Kamera CCTV</h2>
+              <p className="text-[11px] text-text-dim">{cameras.length} kamera • {filtered.length} ditampilkan</p>
             </div>
             {/* Theme toggle */}
             <motion.button
@@ -145,7 +145,7 @@ export default function CCTVPanel({ cameras, selectedId, onSelect, lightMap, set
                   ? "bg-amber-500/10 border border-amber-400/20 text-amber-400"
                   : "bg-bg-card-hover border border-border-default text-text-muted hover:text-text-primary"
               )}
-              title={lightMap ? "Switch to dark map" : "Switch to light map"}
+              title={lightMap ? "Ganti ke map gelap" : "Ganti ke map terang"}
             >
               <AnimatePresence mode="wait" initial={false}>
                 {lightMap ? (
@@ -171,7 +171,7 @@ export default function CCTVPanel({ cameras, selectedId, onSelect, lightMap, set
                 )}
               </AnimatePresence>
               <span className="text-[10px] font-semibold">
-                {lightMap ? "Dark" : "Light"}
+                {lightMap ? "Gelap" : "Terang"}
               </span>
             </motion.button>
           </div>
@@ -186,7 +186,7 @@ export default function CCTVPanel({ cameras, selectedId, onSelect, lightMap, set
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search camera..."
+              placeholder="Cari kamera..."
               className="w-full pl-8.5 pr-3 py-2 bg-bg-input border border-border-default rounded-lg text-xs
                 text-text-primary placeholder:text-text-dim
                 focus:outline-none focus:ring-1 focus:ring-jw-accent/30 focus:border-jw-accent/30
@@ -207,7 +207,7 @@ export default function CCTVPanel({ cameras, selectedId, onSelect, lightMap, set
         {/* Camera list */}
         <div className="flex-1 overflow-y-auto p-2 space-y-1">
           {filtered.length === 0 ? (
-            <p className="text-xs text-text-dim text-center py-8">No cameras found</p>
+            <p className="text-xs text-text-dim text-center py-8">Kamera nggak ketemu</p>
           ) : (
             filtered.map((cam, i) => (
               <CameraItem key={cam.id} cam={cam} selectedId={selectedId} onSelect={onSelect} index={i} />
@@ -219,7 +219,7 @@ export default function CCTVPanel({ cameras, selectedId, onSelect, lightMap, set
         <div className="px-4 py-3 border-t border-border-subtle">
           <div className="flex items-center gap-1.5 text-[10px] text-text-dim">
             <HiSignal className="w-3.5 h-3.5 text-jw-accent/60" />
-            <span>Source: cctv.jogjakota.go.id</span>
+            <span>Sumber: cctv.jogjakota.go.id</span>
           </div>
         </div>
       </aside>
@@ -263,10 +263,10 @@ export default function CCTVPanel({ cameras, selectedId, onSelect, lightMap, set
               <div className="flex items-center gap-2">
                 <HiSignal className="w-3.5 h-3.5 text-jw-accent" />
                 <span className="text-[12px] font-bold text-text-primary">
-                  {cameras.length} CCTV Active
+                  {cameras.length} CCTV Aktif
                 </span>
                 <span className="text-[10px] text-text-dim">
-                  • {filtered.length} shown
+                  • {filtered.length} ditampilkan
                 </span>
               </div>
               <div className="p-1.5 rounded-lg text-text-dim">
@@ -321,7 +321,7 @@ export default function CCTVPanel({ cameras, selectedId, onSelect, lightMap, set
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search camera..."
+                  placeholder="Cari kamera..."
                   className="w-full pl-8.5 pr-3 py-2 bg-bg-input border border-border-default rounded-lg text-xs
                     text-text-primary placeholder:text-text-dim
                     focus:outline-none focus:ring-1 focus:ring-jw-accent/30 focus:border-jw-accent/30
@@ -342,7 +342,7 @@ export default function CCTVPanel({ cameras, selectedId, onSelect, lightMap, set
             {/* Camera list — scrollable */}
             <div className="flex-1 overflow-y-auto px-2 pb-3 space-y-1">
               {filtered.length === 0 ? (
-                <p className="text-xs text-text-dim text-center py-8">No cameras found</p>
+                <p className="text-xs text-text-dim text-center py-8">Kamera nggak ketemu</p>
               ) : (
                 filtered.map((cam, i) => (
                   <CameraItem
@@ -363,7 +363,7 @@ export default function CCTVPanel({ cameras, selectedId, onSelect, lightMap, set
             <div className="px-4 py-2.5 border-t border-border-subtle">
               <div className="flex items-center gap-1.5 text-[10px] text-text-dim">
                 <HiSignal className="w-3.5 h-3.5 text-jw-accent/60" />
-                <span>Source: cctv.jogjakota.go.id</span>
+                <span>Sumber: cctv.jogjakota.go.id</span>
               </div>
             </div>
           </div>

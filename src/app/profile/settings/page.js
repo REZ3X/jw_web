@@ -43,7 +43,7 @@ export default function ProfileSettings() {
       if (birth && birth !== user.birth) body.birth = birth;
 
       if (Object.keys(body).length === 0) {
-        toast("No changes to save");
+        toast("Nggak ada perubahan yang disimpen");
         setSaving(false);
         return;
       }
@@ -53,9 +53,9 @@ export default function ProfileSettings() {
         body: JSON.stringify(body),
       });
       setUser(res.data);
-      toast.success("Profile updated!");
+      toast.success("Profil diupdate!");
     } catch (err) {
-      toast.error(err.message || "Failed to update profile");
+      toast.error(err.message || "Gagal ngupdate profil");
     }
     setSaving(false);
   };
@@ -75,9 +75,9 @@ export default function ProfileSettings() {
         headers: {},
       });
       setUser({ ...user, avatar_url: res.data?.avatar_url || user.avatar_url, use_custom_avatar: true });
-      toast.success("Avatar updated!");
+      toast.success("Avatar diupdate!");
     } catch (err) {
-      toast.error(err.message || "Failed to upload avatar");
+      toast.error(err.message || "Gagal aplod avatar");
     }
     setUploadingAvatar(false);
   };
@@ -87,7 +87,7 @@ export default function ProfileSettings() {
     try {
       await clientFetch("/api/users/me/avatar", { method: "DELETE" });
       setUser({ ...user, use_custom_avatar: false });
-      toast.success("Reverted to Google avatar");
+      toast.success("Balik pake avatar Google");
     } catch (err) {
       toast.error(err.message);
     }
@@ -111,7 +111,7 @@ export default function ProfileSettings() {
           >
             <HiArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-base font-bold text-text-primary">Edit profile</h1>
+          <h1 className="text-base font-bold text-text-primary">Edit profil</h1>
         </motion.div>
 
         {/* ─── Settings card ─────────────────────── */}
@@ -155,7 +155,7 @@ export default function ProfileSettings() {
                     transition-all duration-200 cursor-pointer inline-flex items-center gap-1.5"
                 >
                   <HiCamera className="w-3.5 h-3.5" />
-                  {uploadingAvatar ? "Uploading…" : "Upload"}
+                  {uploadingAvatar ? "Upload..." : "Upload"}
                 </button>
                 {user.use_custom_avatar && (
                   <button
@@ -164,7 +164,7 @@ export default function ProfileSettings() {
                       text-text-muted hover:text-danger hover:border-danger/30
                       transition-all duration-200 cursor-pointer inline-flex items-center gap-1.5"
                   >
-                    <HiTrash className="w-3.5 h-3.5" /> Revert
+                    <HiTrash className="w-3.5 h-3.5" /> Batalin Custom
                   </button>
                 )}
               </div>
@@ -176,7 +176,7 @@ export default function ProfileSettings() {
               {/* Display Name */}
               <div>
                 <label className="block text-[11px] font-bold text-text-dim uppercase tracking-wider mb-1.5">
-                  Display Name
+                  Nama Tampilan
                 </label>
                 <input
                   type="text"
@@ -197,7 +197,7 @@ export default function ProfileSettings() {
                 <textarea
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
-                  placeholder="Tell the community about yourself…"
+                  placeholder="Ceritain diri kamu ke warga..."
                   className="w-full px-4 py-2.5 bg-bg-inset border border-border-default rounded-xl text-sm
                     text-text-primary placeholder:text-text-dim resize-none
                     focus:outline-none focus:ring-2 focus:ring-jw-accent/30 focus:border-jw-accent/40
@@ -211,7 +211,7 @@ export default function ProfileSettings() {
               {/* Birthday */}
               <div>
                 <label className="block text-[11px] font-bold text-text-dim uppercase tracking-wider mb-1.5">
-                  Birthday
+                  Tanggal Lahir
                 </label>
                 <input
                   type="date"
@@ -241,7 +241,7 @@ export default function ProfileSettings() {
               {/* Save button */}
               <div className="flex justify-end pt-2">
                 <Button type="submit" loading={saving}>
-                  <HiCheck className="w-4 h-4" /> Save Changes
+                  <HiCheck className="w-4 h-4" /> Simpen Perubahan
                 </Button>
               </div>
             </form>
@@ -260,12 +260,12 @@ export default function ProfileSettings() {
           className="px-1"
         >
           <div className="flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-text-dim">
-            <Link href="/" className="hover:text-text-muted transition-colors">Home</Link>
+            <Link href="/" className="hover:text-text-muted transition-colors">Beranda</Link>
             <Link href="/explore" className="hover:text-text-muted transition-colors">Explore</Link>
-            <Link href="/chat" className="hover:text-text-muted transition-colors">AI Chat</Link>
+            <Link href="/chat" className="hover:text-text-muted transition-colors">Tanya AI</Link>
           </div>
           <p className="text-[10px] text-text-dim/60 mt-2">
-            © 2026 JogjaWaskita. All rights reserved.
+            © 2026 JogjaWaskita. Hak Cipta Dilindungi.
           </p>
         </motion.div>
       </aside>

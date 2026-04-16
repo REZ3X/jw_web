@@ -76,7 +76,7 @@ export default function PostForm({ onClose, onCreated }) {
   /** AI-classify department from caption */
   const classifyDepartment = async () => {
     if (!caption.trim()) {
-      toast.error("Write a description first so AI can classify");
+      toast.error("Tulis deskripsi dulu biar AI bisa nebak");
       return;
     }
     setClassifying(true);
@@ -87,10 +87,10 @@ export default function PostForm({ onClose, onCreated }) {
       });
       if (res?.data?.department) {
         setDepartment(res.data.department);
-        toast.success(`AI suggests: ${DEPARTMENTS[res.data.department]?.label || res.data.department}`);
+        toast.success(`AI nyaranin: ${DEPARTMENTS[res.data.department]?.label || res.data.department}`);
       }
     } catch (err) {
-      toast.error("AI classification failed. Please select manually.");
+      toast.error("Gagal ditebak AI. Pilih sendiri aja ya.");
     }
     setClassifying(false);
   };
@@ -98,9 +98,9 @@ export default function PostForm({ onClose, onCreated }) {
   /** Submit post */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!caption.trim()) { toast.error("Description is required"); return; }
-    if (images.length === 0) { toast.error("At least one photo is required"); return; }
-    if (!department) { toast.error("Please choose a department"); return; }
+    if (!caption.trim()) { toast.error("Deskripsi wajib diisi"); return; }
+    if (images.length === 0) { toast.error("Minimal kasih satu foto ya"); return; }
+    if (!department) { toast.error("Tolong pilih dinas"); return; }
 
     setSubmitting(true);
     try {
@@ -122,7 +122,7 @@ export default function PostForm({ onClose, onCreated }) {
       onCreated?.(res.data);
       onClose?.();
     } catch (err) {
-      toast.error(err.message || "Failed to submit report");
+      toast.error(err.message || "Gagal ngirim laporan");
     }
     setSubmitting(false);
   };
@@ -149,7 +149,7 @@ export default function PostForm({ onClose, onCreated }) {
           >
             <div className="text-center">
               <HiPhoto className="w-8 h-8 text-jw-accent mx-auto mb-2" />
-              <p className="text-sm font-semibold text-jw-mint">Drop photos here</p>
+              <p className="text-sm font-semibold text-jw-mint">Tarik foto ke sini</p>
             </div>
           </motion.div>
         )}
@@ -161,7 +161,7 @@ export default function PostForm({ onClose, onCreated }) {
           ref={textareaRef}
           value={caption}
           onChange={(e) => setCaption(e.target.value)}
-          placeholder="What's happening in your community? Describe the issue…"
+          placeholder="Ada kejadian apa nih? Ceritain masalahnya..."
           className="w-full min-h-[100px] p-0 bg-transparent border-none text-[15px]
             placeholder:text-text-dim text-text-primary leading-relaxed
             focus:outline-none resize-none"
@@ -233,7 +233,7 @@ export default function PostForm({ onClose, onCreated }) {
                 type="text"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                placeholder="Add location (e.g., Jl. Malioboro)"
+                placeholder="Tambah lokasi (misal: Jl. Malioboro)"
                 className="w-full pl-9 pr-3 py-2 bg-bg-inset border border-border-default rounded-xl text-sm
                   text-text-primary placeholder:text-text-dim
                   focus:outline-none focus:ring-1 focus:ring-jw-accent/30 focus:border-jw-accent/40
@@ -248,7 +248,7 @@ export default function PostForm({ onClose, onCreated }) {
       {/* ── Department selector ── */}
       <div className="mb-3">
         <div className="flex items-center justify-between mb-2">
-          <p className="text-[11px] font-bold text-text-dim uppercase tracking-wider">Department</p>
+          <p className="text-[11px] font-bold text-text-dim uppercase tracking-wider">Dinas</p>
           <button
             type="button"
             onClick={classifyDepartment}
@@ -256,7 +256,7 @@ export default function PostForm({ onClose, onCreated }) {
             className="inline-flex items-center gap-1 text-[11px] font-semibold text-jw-accent hover:text-jw-mint transition-colors disabled:opacity-50 cursor-pointer"
           >
             {classifying ? <ImSpinner8 className="w-3 h-3 animate-spin" /> : <HiSparkles className="w-3 h-3" />}
-            Auto-detect (AI)
+            Tebak Otomatis (AI)
           </button>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
@@ -294,7 +294,7 @@ export default function PostForm({ onClose, onCreated }) {
                 ? "text-text-dim opacity-40 cursor-not-allowed"
                 : "text-jw-accent hover:bg-jw-accent/8"
             )}
-            title={`Add photos (${images.length}/${MAX_IMAGES})`}
+            title={`Tambah foto (${images.length}/${MAX_IMAGES})`}
           >
             <HiPhoto className="w-5 h-5" />
           </button>
@@ -309,7 +309,7 @@ export default function PostForm({ onClose, onCreated }) {
                 ? "text-jw-accent bg-jw-accent/8"
                 : "text-jw-accent hover:bg-jw-accent/8"
             )}
-            title="Add location"
+            title="Tambah lokasi"
           >
             <HiMapPin className="w-5 h-5" />
           </button>
@@ -332,7 +332,7 @@ export default function PostForm({ onClose, onCreated }) {
               <HiGlobeAlt className="w-5 h-5" />
             )}
             <span className="text-[11px] font-semibold hidden sm:inline">
-              {isPrivate ? "Private" : "Public"}
+              {isPrivate ? "Privat" : "Publik"}
             </span>
           </button>
 
@@ -389,7 +389,7 @@ export default function PostForm({ onClose, onCreated }) {
           ) : (
             <HiPaperAirplane className="w-4 h-4" />
           )}
-          <span className="hidden sm:inline">{submitting ? "Submitting…" : "Submit"}</span>
+          <span className="hidden sm:inline">{submitting ? "Ngirim..." : "Kirim"}</span>
         </button>
       </div>
 

@@ -78,7 +78,7 @@ export default function TrendingSidebar() {
           text-xs font-semibold text-jw-accent hover:text-jw-mint
           border-t border-border-subtle transition-colors"
       >
-        Explore all <HiArrowRight className="w-3 h-3" />
+        Liat semua <HiArrowRight className="w-3 h-3" />
       </Link>
     </motion.div>
   );

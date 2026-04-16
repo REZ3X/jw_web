@@ -39,7 +39,6 @@ export default function ProfileView({ profile }) {
   const { user } = useAuthStore();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState("posts");
   const isOwn = user?.id === profile.id;
   const isGov = GOV_ROLES.includes(profile.role);
   const role = getRole(profile.role);
@@ -81,7 +80,7 @@ export default function ProfileView({ profile }) {
           <div>
             <h1 className="text-base font-bold text-text-primary">{profile.name}</h1>
             <p className="text-[11px] text-text-dim">
-              {formatCount(postCount)} {isGov ? "responses" : "posts"}
+              {formatCount(postCount)} {isGov ? "respon" : "laporan"}
             </p>
           </div>
         </motion.div>
@@ -124,7 +123,7 @@ export default function ProfileView({ profile }) {
                     text-text-primary hover:bg-bg-card-hover hover:border-border-accent/40
                     transition-all duration-200 mt-10"
                 >
-                  <HiCog6Tooth className="w-4 h-4" /> Edit profile
+                  <HiCog6Tooth className="w-4 h-4" /> Edit profil
                 </Link>
               )}
             </div>
@@ -152,7 +151,7 @@ export default function ProfileView({ profile }) {
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-xs text-text-dim">
               <span className="inline-flex items-center gap-1">
                 <HiCalendar className="w-3.5 h-3.5 text-text-dim" />
-                Joined {joinDate}
+                Gabung {joinDate}
               </span>
               {profile.email && isOwn && (
                 <span className="inline-flex items-center gap-1">
@@ -166,96 +165,46 @@ export default function ProfileView({ profile }) {
             <div className="flex items-center gap-5 mt-3 text-sm">
               <div>
                 <span className="font-bold text-text-primary tabular-nums">{formatCount(postCount)}</span>
-                <span className="text-text-dim ml-1">{isGov ? "Responses" : "Posts"}</span>
+                <span className="text-text-dim ml-1">{isGov ? "Respon" : "Laporan"}</span>
               </div>
             </div>
           </div>
 
-          {/* ── Tabs ── */}
-          <div className="flex border-t border-border-subtle">
-            <button
-              onClick={() => setTab("posts")}
-              className={cn(
-                "flex-1 py-3 text-sm font-semibold text-center transition-all duration-200 cursor-pointer relative",
-                tab === "posts"
-                  ? "text-jw-mint"
-                  : "text-text-muted hover:text-text-secondary hover:bg-bg-card-hover"
-              )}
-            >
-              {isGov ? "Responses" : "Posts"}
-              {tab === "posts" && (
-                <motion.div
-                  layoutId="profile-tab-underline"
-                  className="absolute bottom-0 left-[20%] right-[20%] h-[3px] rounded-full bg-jw-accent"
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                />
-              )}
-            </button>
-            <button
-              onClick={() => setTab("likes")}
-              className={cn(
-                "flex-1 py-3 text-sm font-semibold text-center transition-all duration-200 cursor-pointer relative",
-                tab === "likes"
-                  ? "text-jw-mint"
-                  : "text-text-muted hover:text-text-secondary hover:bg-bg-card-hover"
-              )}
-            >
-              Likes
-              {tab === "likes" && (
-                <motion.div
-                  layoutId="profile-tab-underline"
-                  className="absolute bottom-0 left-[20%] right-[20%] h-[3px] rounded-full bg-jw-accent"
-                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                />
-              )}
-            </button>
-          </div>
+
         </motion.div>
 
         {/* ─── Posts feed ─────────────────────────── */}
         <div className="mt-3 space-y-3">
-          {tab === "posts" && (
-            <>
-              {loading ? (
-                <div className="space-y-3">
-                  <PostCardSkeleton />
-                  <PostCardSkeleton />
-                </div>
-              ) : posts.length === 0 ? (
-                <EmptyState
-                  icon={isGov ? HiChatBubbleLeftRight : HiDocumentText}
-                  title={isGov ? "No responses yet" : "No reports yet"}
-                  description={
-                    isGov
-                      ? "This department hasn't responded to any reports"
-                      : isOwn
-                        ? "You haven't submitted any reports yet"
-                        : "This user hasn't submitted any reports"
-                  }
-                />
-              ) : (
-                <AnimatePresence mode="popLayout">
-                  {posts.map((post, i) => (
-                    <motion.div
-                      key={post.id}
-                      initial={{ opacity: 0, y: 12 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.25, delay: i < 6 ? i * 0.04 : 0 }}
-                    >
-                      <PostCard post={post} />
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              )}
-            </>
-          )}
-
-          {tab === "likes" && (
+          {loading ? (
+            <div className="space-y-3">
+              <PostCardSkeleton />
+              <PostCardSkeleton />
+            </div>
+          ) : posts.length === 0 ? (
             <EmptyState
-              icon={HiDocumentText}
-              title="Coming soon"
-              description="Liked posts will appear here in a future update"
+              icon={isGov ? HiChatBubbleLeftRight : HiDocumentText}
+              title={isGov ? "Belum ada respon" : "Belum ada laporan"}
+              description={
+                isGov
+                  ? "Dinas ini belum ngerespon laporan apa-apa"
+                  : isOwn
+                    ? "Kamu belum bikin laporan nih"
+                    : "User ini belum bikin laporan"
+              }
             />
+          ) : (
+            <AnimatePresence mode="popLayout">
+              {posts.map((post, i) => (
+                <motion.div
+                  key={post.id}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25, delay: i < 6 ? i * 0.04 : 0 }}
+                >
+                  <PostCard post={post} />
+                </motion.div>
+              ))}
+            </AnimatePresence>
           )}
         </div>
       </div>
@@ -272,12 +221,12 @@ export default function ProfileView({ profile }) {
           className="px-1"
         >
           <div className="flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-text-dim">
-            <Link href="/" className="hover:text-text-muted transition-colors">Home</Link>
+            <Link href="/" className="hover:text-text-muted transition-colors">Beranda</Link>
             <Link href="/explore" className="hover:text-text-muted transition-colors">Explore</Link>
-            <Link href="/chat" className="hover:text-text-muted transition-colors">AI Chat</Link>
+            <Link href="/chat" className="hover:text-text-muted transition-colors">Tanya AI</Link>
           </div>
           <p className="text-[10px] text-text-dim/60 mt-2">
-            © 2026 JogjaWaskita. All rights reserved.
+            © 2026 JogjaWaskita. Hak Cipta Dilindungi.
           </p>
         </motion.div>
       </aside>

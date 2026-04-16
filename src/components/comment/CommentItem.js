@@ -17,6 +17,7 @@ import VoteButtons from "@/components/post/VoteButtons";
 import Dropdown, { DropdownItem } from "@/components/ui/Dropdown";
 import CommentForm from "./CommentForm";
 import SubCommentItem from "./SubCommentItem";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 import { useAuthStore } from "@/lib/store";
 import { clientFetch } from "@/lib/api";
 import { timeAgo, cn } from "@/lib/utils";
@@ -29,6 +30,8 @@ export default function CommentItem({ comment, postOwnerId, onDeleted }) {
   const [replies, setReplies] = useState([]);
   const [repliesLoaded, setRepliesLoaded] = useState(false);
   const [showReplyForm, setShowReplyForm] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const isOwner = user?.id === comment.user_id;
   const isPostOwner = user?.id === postOwnerId;
@@ -46,25 +49,27 @@ export default function CommentItem({ comment, postOwnerId, onDeleted }) {
       setRepliesLoaded(true);
       setShowReplies(true);
     } catch {
-      toast.error("Failed to load replies");
+      toast.error("Gagal memuat balasan");
     }
   };
 
   const handleDelete = async () => {
-    if (!confirm("Delete this comment?")) return;
+    setIsDeleting(true);
     try {
       await clientFetch(`/api/comments/${comment.id}`, { method: "DELETE" });
       onDeleted?.(comment.id);
-      toast.success("Comment deleted");
+      toast.success("Komentar dihapus");
     } catch (err) {
       toast.error(err.message);
     }
+    setIsDeleting(false);
+    setShowDeleteConfirm(false);
   };
 
   const handlePin = async () => {
     try {
       await clientFetch(`/api/comments/${comment.id}/pin`, { method: "POST" });
-      toast.success(comment.is_pinned ? "Unpinned" : "Pinned");
+      toast.success(comment.is_pinned ? "Lepas semat" : "Sematkan");
     } catch (err) {
       toast.error(err.message);
     }
@@ -80,7 +85,7 @@ export default function CommentItem({ comment, postOwnerId, onDeleted }) {
     <div className={cn("py-3", comment.is_pinned && "bg-jw-accent/5 rounded-xl px-3 -mx-3 border border-jw-accent/10")}>
       {comment.is_pinned && (
         <div className="flex items-center gap-1 text-xs text-jw-accent font-semibold mb-1.5">
-          <BsPin className="w-3 h-3" /> Pinned
+          <BsPin className="w-3 h-3" /> Disematkan
         </div>
       )}
 
@@ -97,11 +102,11 @@ export default function CommentItem({ comment, postOwnerId, onDeleted }) {
             </Link>
             {comment.is_official && (
               <Badge className="bg-jw-accent/15 text-jw-highlight border border-jw-accent/30 text-[10px]">
-                Official Response
+                Respon Resmi
               </Badge>
             )}
             <span className="text-xs text-muted">{timeAgo(comment.created_at)}</span>
-            {comment.is_edited && <span className="text-xs text-muted-light">(edited)</span>}
+            {comment.is_edited && <span className="text-xs text-muted-light">(diedit)</span>}
 
             {/* Actions dropdown */}
             {(isOwner || isPostOwner) && (
@@ -110,12 +115,12 @@ export default function CommentItem({ comment, postOwnerId, onDeleted }) {
               >
                 {isPostOwner && (
                   <DropdownItem onClick={handlePin}>
-                    <BsPin className="w-3.5 h-3.5" /> {comment.is_pinned ? "Unpin" : "Pin"}
+                    <BsPin className="w-3.5 h-3.5" /> {comment.is_pinned ? "Lepas semat" : "Sematkan"}
                   </DropdownItem>
                 )}
                 {isOwner && (
-                  <DropdownItem danger onClick={handleDelete}>
-                    <HiTrash className="w-3.5 h-3.5" /> Delete
+                  <DropdownItem danger onClick={() => setShowDeleteConfirm(true)}>
+                    <HiTrash className="w-3.5 h-3.5" /> Hapus
                   </DropdownItem>
                 )}
               </Dropdown>
@@ -147,7 +152,7 @@ export default function CommentItem({ comment, postOwnerId, onDeleted }) {
                 onClick={() => setShowReplyForm(!showReplyForm)}
                 className="text-xs text-muted hover:text-jw-accent font-semibold transition-colors cursor-pointer"
               >
-                Reply
+                Balas
               </button>
             )}
             {comment.reply_count > 0 && (
@@ -156,7 +161,7 @@ export default function CommentItem({ comment, postOwnerId, onDeleted }) {
                 className="flex items-center gap-1 text-xs text-jw-accent font-semibold hover:text-jw-highlight transition-colors cursor-pointer"
               >
                 {showReplies ? <HiChevronUp className="w-3.5 h-3.5" /> : <HiChevronDown className="w-3.5 h-3.5" />}
-                {comment.reply_count} {comment.reply_count === 1 ? "reply" : "replies"}
+                {comment.reply_count} {comment.reply_count === 1 ? "balasan" : "balasan"}
               </button>
             )}
           </div>
@@ -183,6 +188,17 @@ export default function CommentItem({ comment, postOwnerId, onDeleted }) {
           )}
         </div>
       </div>
+
+      <ConfirmModal
+        open={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDelete}
+        title="Hapus Komentar"
+        description="Yakin mau hapus komentar ini?"
+        confirmText="Ya, Hapus"
+        danger
+        loading={isDeleting}
+      />
     </div>
   );
 }

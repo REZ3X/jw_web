@@ -2,7 +2,8 @@
  * @file utils.js — Shared utility functions.
  */
 
-import { formatDistanceToNow, format, parseISO } from "date-fns";
+import { formatDistanceToNow, format, parseISO, addHours } from "date-fns";
+import { id as idLocale } from "date-fns/locale";
 import { DEPARTMENTS, ROLES, POST_STATUS } from "./constants";
 
 /**
@@ -20,27 +21,29 @@ export function cn(...classes) {
 export function timeAgo(dateStr) {
   if (!dateStr) return "";
   try {
-    const date = typeof dateStr === "string" ? parseISO(dateStr) : dateStr;
-    return formatDistanceToNow(date, { addSuffix: true });
+    const parsed = typeof dateStr === "string" ? parseISO(dateStr) : dateStr;
+    const dateWithTimezoneOffset = addHours(parsed, 7);
+    return formatDistanceToNow(dateWithTimezoneOffset, { addSuffix: true, locale: idLocale });
   } catch {
     return dateStr;
   }
 }
 
 /** Format a date string as a readable date. */
-export function formatDate(dateStr, fmt = "MMM d, yyyy") {
+export function formatDate(dateStr, fmt = "d MMM yyyy") {
   if (!dateStr) return "";
   try {
-    const date = typeof dateStr === "string" ? parseISO(dateStr) : dateStr;
-    return format(date, fmt);
+    const parsed = typeof dateStr === "string" ? parseISO(dateStr) : dateStr;
+    const dateWithTimezoneOffset = addHours(parsed, 7);
+    return format(dateWithTimezoneOffset, fmt, { locale: idLocale });
   } catch {
     return dateStr;
   }
 }
 
-/** Format a date as "MMM d, yyyy 'at' h:mm a" */
+/** Format a date as "d MMM yyyy, HH:mm" */
 export function formatDateTime(dateStr) {
-  return formatDate(dateStr, "MMM d, yyyy 'at' h:mm a");
+  return formatDate(dateStr, "d MMM yyyy, HH:mm");
 }
 
 /** Get department display info from a role/department key */

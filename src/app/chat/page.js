@@ -23,6 +23,7 @@ import {
   HiDocumentText, HiLightBulb, HiMagnifyingGlass
 } from "react-icons/hi2";
 import { motion, AnimatePresence } from "framer-motion";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 import { useAuthStore } from "@/lib/store";
 import { clientFetch } from "@/lib/api";
 import { timeAgo, cn } from "@/lib/utils";
@@ -31,27 +32,27 @@ import toast from "react-hot-toast";
 const SUGGESTIONS = [
   {
     icon: HiDocumentText,
-    title: "Draft a report",
-    desc: "Help me write a civic issue report",
-    prompt: "Help me draft a report about a pothole on Jl. Malioboro",
+    title: "Bikin laporan",
+    desc: "Bantu aku bikin laporan masalah sekitar",
+    prompt: "Bantu aku bikin laporan soal jalan berlubang di Jl. Malioboro",
   },
   {
     icon: HiLightBulb,
-    title: "Understand policies",
-    desc: "Explain government regulations",
-    prompt: "Explain how the public complaint resolution process works in Yogyakarta",
+    title: "Pahami aturan",
+    desc: "Jelasin regulasi pemerintah",
+    prompt: "Jelasin gimana sih proses komplain publik di Jogja",
   },
   {
     icon: HiMagnifyingGlass,
-    title: "Explore data",
-    desc: "Analyze community reports & trends",
-    prompt: "What are the most common issues reported this month?",
+    title: "Cari tau data",
+    desc: "Liat tren masalah di komunitas",
+    prompt: "Bulan ini masalah yang paling sering dilaporin apa aja ya?",
   },
   {
     icon: HiSparkles,
-    title: "Get suggestions",
-    desc: "AI recommendations for your area",
-    prompt: "What civic improvements would benefit the Malioboro area?",
+    title: "Minta saran",
+    desc: "Rekomendasi dari AI buat area kamu",
+    prompt: "Fasilitas publik apa sih yang bagus ditambahin di Malioboro?",
   },
 ];
 
@@ -62,6 +63,9 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [chatToDelete, setChatToDelete] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -75,7 +79,7 @@ export default function ChatPage() {
 
   const createChat = async (initialPrompt) => {
     if (!user?.email_verified) {
-      toast.error("Please verify your email to use AI Chat.");
+      toast.error("Verifikasi email dulu ya buat pake AI Chat.");
       return;
     }
     try {
@@ -94,15 +98,24 @@ export default function ChatPage() {
     }
   };
 
-  const deleteChat = async (id) => {
-    if (!confirm("Delete this conversation?")) return;
+  const handleDeleteClick = (id) => {
+    setChatToDelete(id);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDeleteChat = async () => {
+    if (!chatToDelete) return;
+    setIsDeleting(true);
     try {
-      await clientFetch(`/api/chats/${id}`, { method: "DELETE" });
-      setChats((prev) => prev.filter((c) => c.id !== id));
-      toast.success("Chat deleted");
+      await clientFetch(`/api/chats/${chatToDelete}`, { method: "DELETE" });
+      setChats((prev) => prev.filter((c) => c.id !== chatToDelete));
+      toast.success("Chat dihapus");
     } catch (err) {
       toast.error(err.message);
     }
+    setIsDeleting(false);
+    setShowDeleteConfirm(false);
+    setChatToDelete(null);
   };
 
   // Redirect must happen in a useEffect (not during render) to avoid SSR location errors
@@ -123,20 +136,20 @@ export default function ChatPage() {
           <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto mb-5">
             <HiCpuChip className="w-8 h-8 text-amber-400" />
           </div>
-          <h2 className="text-xl font-bold mb-2 text-text-primary">Verify Your Email First</h2>
+          <h2 className="text-xl font-bold mb-2 text-text-primary">Verifikasi Email Kamu Dulu</h2>
           <p className="text-sm text-text-muted mb-6">
-            AI Chat requires a verified email address. Check your inbox for the verification link.
+            AI Chat butuh verifikasi email. Cek inbox kamu ya buat dapet link verifikasi.
           </p>
           <button
             onClick={async () => {
               try {
                 await fetch("/api/auth/resend-verification", { method: "POST" });
-                toast.success("Verification email resent!");
-              } catch { toast.error("Failed to resend"); }
+                toast.success("Email verifikasi udah dikirim ulang!");
+              } catch { toast.error("Gagal ngirim ulang"); }
             }}
             className="px-6 py-2.5 rounded-xl bg-amber-500 text-white font-semibold hover:bg-amber-600 transition-all cursor-pointer"
           >
-            Resend Verification Email
+            Kirim Ulang Email Verifikasi
           </button>
         </motion.div>
       </div>
@@ -179,7 +192,7 @@ export default function ChatPage() {
         <button
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           className="hidden md:flex absolute top-4 right-4 items-center justify-center p-1.5 rounded-lg text-text-muted hover:bg-bg-card-hover hover:text-text-primary transition-all z-10"
-          title={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
+          title={isSidebarOpen ? "Tutup sidebar" : "Buka sidebar"}
         >
           {isSidebarOpen ? <HiChevronRight className="w-5 h-5" /> : <HiChevronLeft className="w-5 h-5" />}
         </button>
@@ -193,11 +206,11 @@ export default function ChatPage() {
           <div className="mb-8 sm:mb-10 mt-18">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-text-primary mb-2"
               style={{ textShadow: '0 1px 8px rgba(0,0,0,0.2)' }}>
-              How can I help you today?
+              Ada yang bisa dibantu hari ini?
             </h1>
             <p className="text-xs sm:text-sm text-text-muted max-w-lg"
               style={{ textShadow: '0 1px 4px rgba(0,0,0,0.15)' }}>
-              Ask about civic issues, draft reports, explore community data, or get recommendations.
+              Tanya soal masalah warga, bikin laporan, cari data komunitas, atau minta saran.
             </p>
           </div>
 
@@ -249,7 +262,7 @@ export default function ChatPage() {
                 shadow-lg shadow-jw-accent/15 cursor-pointer font-semibold text-sm"
             >
               <HiChatBubbleLeftRight className="w-5 h-5" />
-              Start a Conversation
+              Mulai Ngobrol
             </motion.button>
           </div>
 
@@ -259,11 +272,11 @@ export default function ChatPage() {
               <div>
                 <div className="flex items-center justify-between mb-3 px-1">
                   <h3 className="text-[11px] font-bold text-text-dim uppercase tracking-wider">
-                    Recent Conversations
+                    Obrolan Terakhir
                   </h3>
                   {chats.length > 5 && (
                     <Link href="#" className="text-[11px] font-semibold text-jw-accent hover:text-jw-mint transition-colors">
-                      View all
+                      Liat semua
                     </Link>
                   )}
                 </div>
@@ -311,7 +324,7 @@ export default function ChatPage() {
                 transition-all duration-200 cursor-pointer"
             >
               <HiPlus className="w-4 h-4" />
-              New chat
+              Chat baru
             </button>
           </div>
 
@@ -324,7 +337,7 @@ export default function ChatPage() {
                 ))}
               </div>
             ) : chats.length === 0 ? (
-              <p className="text-xs text-text-dim text-center py-8">No conversations yet</p>
+              <p className="text-xs text-text-dim text-center py-8">Belum ada obrolan nih</p>
             ) : (
               chats.map((chat) => (
                 <div key={chat.id} className="group flex items-center rounded-lg hover:bg-bg-card-hover transition-colors">
@@ -339,7 +352,7 @@ export default function ChatPage() {
                     </div>
                   </Link>
                   <button
-                    onClick={() => deleteChat(chat.id)}
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDeleteClick(chat.id); }}
                     className="p-1.5 mr-1 rounded-md text-text-dim opacity-0 group-hover:opacity-100
                       hover:text-danger hover:bg-danger/8 transition-all cursor-pointer"
                   >
@@ -352,6 +365,19 @@ export default function ChatPage() {
         </div>
       </motion.aside>
 
+      <ConfirmModal
+        open={showDeleteConfirm}
+        onClose={() => {
+          setShowDeleteConfirm(false);
+          setChatToDelete(null);
+        }}
+        onConfirm={confirmDeleteChat}
+        title="Hapus Chat"
+        description="Yakin mau hapus riwayat obrolan ini?"
+        confirmText="Ya, Hapus"
+        danger
+        loading={isDeleting}
+      />
     </div>
   );
 }

@@ -7,7 +7,7 @@
 import { HiMagnifyingGlass, HiXMark } from "react-icons/hi2";
 import { cn } from "@/lib/utils";
 
-export default function SearchInput({ value, onChange, placeholder = "Search…", className, onSubmit }) {
+export default function SearchInput({ value, onChange, placeholder = "Cari...", className, onSubmit }) {
   return (
     <form
       onSubmit={(e) => {

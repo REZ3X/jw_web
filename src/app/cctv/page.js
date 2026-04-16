@@ -26,7 +26,7 @@ const CCTVMap = dynamic(() => import("@/components/cctv/CCTVMap"), {
         <div className="w-10 h-10 rounded-xl bg-jw-accent/10 flex items-center justify-center mx-auto mb-3 animate-pulse">
           <HiVideoCamera className="w-5 h-5 text-jw-accent" />
         </div>
-        <p className="text-sm text-text-muted">Loading CCTV Map…</p>
+        <p className="text-sm text-text-muted">Lagi loading Map CCTV nih...</p>
       </div>
     </div>
   ),
@@ -75,7 +75,7 @@ export default function CCTVPage() {
             flex items-center justify-center mx-auto mb-4 animate-pulse">
             <HiVideoCamera className="w-6 h-6 text-jw-accent" />
           </div>
-          <p className="text-sm font-medium text-text-primary mb-1">Loading CCTV Data</p>
+          <p className="text-sm font-medium text-text-primary mb-1">Ditunggu ya, lagi ambil data CCTV...</p>
         </div>
       </div>
     );
@@ -127,7 +127,7 @@ export default function CCTVPage() {
               CCTV Kota Yogyakarta
             </h1>
             <p className="text-[10px] text-text-dim mt-0.5">
-              {cameras.length} cameras • Live monitoring
+              {cameras.length} kamera • Monitoring langsung
             </p>
           </div>
         </div>
@@ -144,7 +144,7 @@ export default function CCTVPage() {
                 ? "bg-white/90 border-gray-200 shadow-black/10 text-gray-700"
                 : "bg-bg-primary/85 border-border-default shadow-black/30 text-text-primary"
             )}
-            title={lightMap ? "Switch to dark map" : "Switch to light map"}
+            title={lightMap ? "Ganti ke map gelap" : "Ganti ke map terang"}
           >
             <AnimatePresence mode="wait" initial={false}>
               {lightMap ? (
@@ -170,7 +170,7 @@ export default function CCTVPage() {
               )}
             </AnimatePresence>
             <span className="text-[11px] font-semibold">
-              {lightMap ? "Dark" : "Light"}
+              {lightMap ? "Gelap" : "Terang"}
             </span>
           </motion.button>
         </div>

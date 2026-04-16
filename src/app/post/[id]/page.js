@@ -31,6 +31,7 @@ import MediaGallery from "@/components/post/MediaGallery";
 import CommentSection from "@/components/comment/CommentSection";
 import TrendingSidebar from "@/components/layout/TrendingSidebar";
 import Dropdown, { DropdownItem } from "@/components/ui/Dropdown";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 import { PostCardSkeleton } from "@/components/ui/Skeleton";
 import { clientFetch } from "@/lib/api";
 import { timeAgo, parseCaption, getDepartment, getStatus, cn, formatCount } from "@/lib/utils";
@@ -44,6 +45,8 @@ function PostDetailContent({ id }) {
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -51,7 +54,7 @@ function PostDetailContent({ id }) {
         const res = await clientFetch(`/api/posts/${id}`);
         setPost(res?.data || res);
       } catch (err) {
-        setError(err.message || "Post not found");
+        setError(err.message || "Laporan nggak ketemu");
       }
       setLoading(false);
     };
@@ -59,20 +62,22 @@ function PostDetailContent({ id }) {
   }, [id]);
 
   const handleDelete = async () => {
-    if (!confirm("Delete this post? This cannot be undone.")) return;
+    setIsDeleting(true);
     try {
       await clientFetch(`/api/posts/${post.id}`, { method: "DELETE" });
-      toast.success("Post deleted");
+      toast.success("Laporan dihapus");
       router.push("/");
     } catch (err) {
-      toast.error(err.message || "Failed to delete");
+      toast.error(err.message || "Gagal dihapus");
     }
+    setIsDeleting(false);
+    setShowDeleteConfirm(false);
   };
 
   const handleShare = () => {
     const url = `${window.location.origin}/post/${id}`;
     navigator.clipboard?.writeText(url);
-    toast.success("Link copied to clipboard");
+    toast.success("Link disalin ke clipboard");
   };
 
   if (loading) {
@@ -110,12 +115,12 @@ function PostDetailContent({ id }) {
             >
               <HiArrowLeft className="w-5 h-5" />
             </button>
-            <h1 className="text-lg font-bold text-text-primary">Post</h1>
+            <h1 className="text-lg font-bold text-text-primary">Laporan</h1>
           </div>
           <div className="rounded-xl bg-bg-card border border-border-default p-8 text-center">
-            <p className="text-text-muted mb-4">{error || "Post not found"}</p>
+            <p className="text-text-muted mb-4">{error || "Laporan nggak ketemu"}</p>
             <Link href="/" className="text-sm font-semibold text-jw-accent hover:text-jw-mint transition-colors">
-              Go back home
+              Balik ke beranda
             </Link>
           </div>
         </div>
@@ -155,8 +160,8 @@ function PostDetailContent({ id }) {
             <HiArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-base font-bold text-text-primary">Post</h1>
-            <p className="text-[11px] text-text-dim">{formatCount(post.comment_count || 0)} comments</p>
+            <h1 className="text-base font-bold text-text-primary">Laporan</h1>
+            <p className="text-[11px] text-text-dim">{formatCount(post.comment_count || 0)} komentar</p>
           </div>
         </motion.div>
 
@@ -190,7 +195,7 @@ function PostDetailContent({ id }) {
                     </Link>
                     {isGov && (
                       <Badge className="bg-jw-accent/15 text-jw-mint border border-jw-accent/30 text-[10px]">
-                        Official
+                        Pemerintah
                       </Badge>
                     )}
                     {post.is_private && <HiLockClosed className="w-3.5 h-3.5 text-text-dim" />}
@@ -208,8 +213,8 @@ function PostDetailContent({ id }) {
                   <Dropdown
                     trigger={<HiEllipsisHorizontal className="w-5 h-5 text-text-dim hover:text-text-secondary transition-colors cursor-pointer" />}
                   >
-                    <DropdownItem danger onClick={handleDelete}>
-                      <HiTrash className="w-4 h-4" /> Delete
+                    <DropdownItem danger onClick={() => setShowDeleteConfirm(true)}>
+                      <HiTrash className="w-4 h-4" /> Hapus
                     </DropdownItem>
                   </Dropdown>
                 )}
@@ -269,7 +274,7 @@ function PostDetailContent({ id }) {
               {post.is_edited && (
                 <>
                   <span>·</span>
-                  <span className="text-text-dim">Edited</span>
+                  <span className="text-text-dim">Diedit</span>
                 </>
               )}
             </div>
@@ -278,15 +283,15 @@ function PostDetailContent({ id }) {
             <div className="flex items-center gap-4 py-3 border-b border-border-subtle text-xs">
               <div className="flex items-center gap-1">
                 <span className="font-bold text-text-primary tabular-nums">{formatCount(post.upvote_count || 0)}</span>
-                <span className="text-text-dim">Upvotes</span>
+                <span className="text-text-dim">Upvote</span>
               </div>
               <div className="flex items-center gap-1">
                 <span className="font-bold text-text-primary tabular-nums">{formatCount(post.downvote_count || 0)}</span>
-                <span className="text-text-dim">Downvotes</span>
+                <span className="text-text-dim">Downvote</span>
               </div>
               <div className="flex items-center gap-1">
                 <span className="font-bold text-text-primary tabular-nums">{formatCount(post.comment_count || 0)}</span>
-                <span className="text-text-dim">Comments</span>
+                <span className="text-text-dim">Komentar</span>
               </div>
             </div>
 
@@ -306,7 +311,7 @@ function PostDetailContent({ id }) {
                   transition-all duration-200 text-xs font-medium cursor-pointer"
               >
                 <HiChatBubbleOvalLeft className="w-4.5 h-4.5" />
-                <span className="hidden sm:inline">Comment</span>
+                <span className="hidden sm:inline">Komen</span>
               </button>
               <button
                 onClick={handleShare}
@@ -339,15 +344,26 @@ function PostDetailContent({ id }) {
           className="px-1"
         >
           <div className="flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-text-dim">
-            <Link href="/" className="hover:text-text-muted transition-colors">Home</Link>
+            <Link href="/" className="hover:text-text-muted transition-colors">Beranda</Link>
             <Link href="/explore" className="hover:text-text-muted transition-colors">Explore</Link>
-            <Link href="/chat" className="hover:text-text-muted transition-colors">AI Chat</Link>
+            <Link href="/chat" className="hover:text-text-muted transition-colors">Tanya AI</Link>
           </div>
           <p className="text-[10px] text-text-dim/60 mt-2">
-            © 2026 JogjaWaskita. All rights reserved.
+            © 2026 JogjaWaskita. Hak Cipta Dilindungi.
           </p>
         </motion.div>
       </aside>
+
+      <ConfirmModal
+        open={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDelete}
+        title="Hapus Laporan"
+        description="Yakin mau hapus laporan ini? Nggak bisa dibalikin lho."
+        confirmText="Ya, Hapus"
+        danger
+        loading={isDeleting}
+      />
     </div>
   );
 }

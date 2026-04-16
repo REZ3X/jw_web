@@ -96,29 +96,29 @@ export default function Navbar() {
   const handleResend = async () => {
     try {
       await clientFetch("/api/auth/resend-verification", { method: "POST" });
-      toast.success("Verification email resent!");
+      toast.success("Email verifikasi berhasil dikirim ulang!");
     } catch (err) {
-      toast.error(err.message || "Failed to resend email");
+      toast.error(err.message || "Gagal mengirim ulang email");
     }
   };
 
   /* ── Desktop nav links ─────────────────────────────────────────── */
   const desktopLinks = [
-    { href: "/", label: "Home", icon: HiHome },
+    { href: "/", label: "Beranda", icon: HiHome },
     { href: "/explore", label: "Explore", icon: HiGlobeAlt },
-    { href: "/cctv", label: "CCTV Map", icon: HiVideoCamera },
-    ...(user ? [{ href: "/chat", label: "AI Chat", icon: HiChatBubbleLeftRight }] : []),
+    { href: "/cctv", label: "Pantau CCTV", icon: HiVideoCamera },
+    ...(user ? [{ href: "/chat", label: "Tanya AI", icon: HiChatBubbleLeftRight }] : []),
   ];
 
   /* ── Mobile bottom nav items ───────────────────────────────────── */
   const mobileNavItems = [
-    { href: "/", icon: HiHome, label: "Home" },
+    { href: "/", icon: HiHome, label: "Beranda" },
     { href: "/explore", icon: HiGlobeAlt, label: "Explore" },
     { href: "/cctv", icon: HiVideoCamera, label: "CCTV" },
     ...(user ? [{ href: "/chat", icon: HiChatBubbleLeftRight, label: "Chat" }] : []),
     ...(user
-      ? [{ href: `/profile/${user.username}`, icon: HiUser, label: "Profile" }]
-      : [{ href: "/auth/login", icon: HiUser, label: "Join" }]
+      ? [{ href: `/profile/${user.username}`, icon: HiUser, label: "Profil" }]
+      : [{ href: "/auth/login", icon: HiUser, label: "Masuk" }]
     ),
   ];
 
@@ -132,12 +132,12 @@ export default function Navbar() {
       {loaded && user && !user.email_verified && (
         <div className="bg-warning/10 border-b border-warning/20 px-4 py-2 relative z-50">
           <div className="max-w-[1200px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-warning">
-            <p>Please verify your email address. You won&apos;t be able to comment until you do.</p>
+            <p>Verifikasi email kamu dulu ya. Kamu nggak bisa komen sebelum verifikasi.</p>
             <button
               onClick={handleResend}
               className="font-semibold hover:underline cursor-pointer whitespace-nowrap"
             >
-              Resend Email
+              Kirim Ulang Email
             </button>
           </div>
         </div>
@@ -184,7 +184,7 @@ export default function Navbar() {
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search reports…"
+                  placeholder="Cari laporan..."
                   className="w-full pl-9 pr-4 py-2 bg-bg-input border border-border-default rounded-lg text-sm
                     text-text-primary placeholder:text-text-dim
                     focus:outline-none focus:ring-1 focus:ring-jw-accent/40 focus:border-jw-accent/40
@@ -219,7 +219,7 @@ export default function Navbar() {
                   href="/auth/login"
                   className="px-4 py-2 rounded-lg gradient-btn text-sm font-semibold"
                 >
-                  Join Now
+                  Ayo Gabung
                 </Link>
               )}
 
@@ -240,10 +240,10 @@ export default function Navbar() {
                     <p className="text-xs text-text-muted truncate">@{user.username}</p>
                   </div>
                   <DropdownItem onClick={() => router.push(`/profile/${user.username}`)}>
-                    <HiUser className="w-4 h-4" /> Profile
+                    <HiUser className="w-4 h-4" /> Profil
                   </DropdownItem>
                   <DropdownItem onClick={() => router.push("/profile/settings")}>
-                    <HiCog6Tooth className="w-4 h-4" /> Settings
+                    <HiCog6Tooth className="w-4 h-4" /> Pengaturan
                   </DropdownItem>
                   {(isGovRole(user.role) || isDevRole(user.role)) && (
                     <DropdownItem onClick={() => router.push("/dashboard")}>
@@ -257,7 +257,7 @@ export default function Navbar() {
                   )}
                   <div className="border-t border-border-subtle my-0.5" />
                   <DropdownItem danger onClick={handleLogout}>
-                    <HiArrowRightOnRectangle className="w-4 h-4" /> Log Out
+                    <HiArrowRightOnRectangle className="w-4 h-4" /> Keluar
                   </DropdownItem>
                 </Dropdown>
               )}
@@ -282,14 +282,14 @@ export default function Navbar() {
                     <p className="text-xs text-text-muted truncate">@{user.username}</p>
                   </div>
                   <DropdownItem onClick={() => router.push(`/profile/${user.username}`)}>
-                    <HiUser className="w-4 h-4" /> Profile
+                    <HiUser className="w-4 h-4" /> Profil
                   </DropdownItem>
                   <DropdownItem onClick={() => router.push("/profile/settings")}>
-                    <HiCog6Tooth className="w-4 h-4" /> Settings
+                    <HiCog6Tooth className="w-4 h-4" /> Pengaturan
                   </DropdownItem>
                   <div className="border-t border-border-subtle my-0.5" />
                   <DropdownItem danger onClick={handleLogout}>
-                    <HiArrowRightOnRectangle className="w-4 h-4" /> Log Out
+                    <HiArrowRightOnRectangle className="w-4 h-4" /> Keluar
                   </DropdownItem>
                 </Dropdown>
               </div>

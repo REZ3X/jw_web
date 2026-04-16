@@ -23,6 +23,7 @@ import VoteButtons from "./VoteButtons";
 import MediaGallery from "./MediaGallery";
 import PostModal from "./PostModal";
 import Dropdown, { DropdownItem } from "@/components/ui/Dropdown";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 import { useAuthStore } from "@/lib/store";
 import { timeAgo, parseCaption, getDepartment, getStatus, cn, formatCount } from "@/lib/utils";
 import { GOV_ROLES } from "@/lib/constants";
@@ -33,6 +34,8 @@ export default function PostCard({ post, onDelete }) {
   const { user } = useAuthStore();
   const [modalOpen, setModalOpen] = useState(false);
   const [deleted, setDeleted] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   if (deleted) return null;
 
@@ -43,15 +46,17 @@ export default function PostCard({ post, onDelete }) {
   const isGov = GOV_ROLES.includes(post.user_role);
 
   const handleDelete = async () => {
-    if (!confirm("Delete this post? This cannot be undone.")) return;
+    setIsDeleting(true);
     try {
       await clientFetch(`/api/posts/${post.id}`, { method: "DELETE" });
       setDeleted(true);
       onDelete?.(post.id);
-      toast.success("Post deleted");
+      toast.success("Post dihapus");
     } catch (err) {
-      toast.error(err.message || "Failed to delete");
+      toast.error(err.message || "Gagal dihapus");
     }
+    setIsDeleting(false);
+    setShowDeleteConfirm(false);
   };
 
   return (
@@ -104,8 +109,8 @@ export default function PostCard({ post, onDelete }) {
                   <DropdownItem onClick={() => setModalOpen(true)}>
                     <HiPencilSquare className="w-4 h-4" /> Edit
                   </DropdownItem>
-                  <DropdownItem danger onClick={handleDelete}>
-                    <HiTrash className="w-4 h-4" /> Delete
+                  <DropdownItem danger onClick={() => setShowDeleteConfirm(true)}>
+                    <HiTrash className="w-4 h-4" /> Hapus
                   </DropdownItem>
                 </Dropdown>
               )}
@@ -181,6 +186,17 @@ export default function PostCard({ post, onDelete }) {
       {modalOpen && (
         <PostModal post={post} onClose={() => setModalOpen(false)} />
       )}
+
+      <ConfirmModal
+        open={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleDelete}
+        title="Hapus Laporan"
+        description="Yakin mau hapus post ini? Nggak bisa dibalikin lho."
+        confirmText="Ya, Hapus"
+        danger
+        loading={isDeleting}
+      />
     </>
   );
 }

@@ -32,11 +32,11 @@ export default function CreateReportModal() {
   useEffect(() => {
     const handler = () => {
       if (!user) {
-        toast.error("Sign in to create a report");
+        toast.error("Login dulu ya buat bikin laporan");
         return;
       }
       if (!user.email_verified) {
-        toast.error("Please verify your email first");
+        toast.error("Verifikasi email kamu dulu ya");
         return;
       }
       setOpen(true);
@@ -63,7 +63,7 @@ export default function CreateReportModal() {
     setOpen(false);
     // If on home page, dispatch reload event
     window.dispatchEvent(new CustomEvent("jw:post-created", { detail: newPost }));
-    toast.success("Report submitted!");
+    toast.success("Laporan terkirim!");
   }, []);
 
   return (
@@ -102,7 +102,7 @@ export default function CreateReportModal() {
                 </button>
                 <h2 className="text-sm font-bold text-text-primary flex items-center gap-2">
                   <HiPencilSquare className="w-4 h-4 text-jw-accent" />
-                  New Report
+                  Laporan Baru
                 </h2>
               </div>
             </div>
@@ -115,7 +115,7 @@ export default function CreateReportModal() {
                   <Avatar src={user.avatar_url} name={user.name} size="sm" />
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-text-primary truncate">{user.name}</p>
-                    <p className="text-[11px] text-text-dim">Posting as @{user.username}</p>
+                    <p className="text-[11px] text-text-dim">Posting sebagai @{user.username}</p>
                   </div>
                 </div>
               )}

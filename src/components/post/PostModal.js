@@ -77,7 +77,7 @@ export default function PostModal({ post, onClose }) {
     e.stopPropagation();
     const url = `${window.location.origin}/post/${post.id}`;
     navigator.clipboard?.writeText(url);
-    toast.success("Link copied to clipboard");
+    toast.success("Link disalin ke clipboard");
   };
 
   return (
@@ -97,7 +97,7 @@ export default function PostModal({ post, onClose }) {
         initial={{ opacity: 0, scale: 0.95, y: 16 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-        className="relative w-full max-w-2xl rounded-2xl bg-bg-card border border-border-default shadow-2xl shadow-black/50 overflow-hidden max-h-[96vh] sm:max-h-[94vh] flex flex-col"
+        className="relative w-full max-w-2xl rounded-2xl bg-bg-card border border-border-default shadow-2xl shadow-black/50 overflow-hidden max-h-[90dvh] sm:max-h-[94vh] flex flex-col"
       >
         {/* ── Sticky header ── */}
         <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-border-subtle bg-bg-card/90 backdrop-blur-lg sticky top-0 z-10">
@@ -114,7 +114,7 @@ export default function PostModal({ post, onClose }) {
 
         {/* ── Scrollable body ── */}
         <div className="overflow-y-auto flex-1">
-          <div className="p-4 sm:p-5">
+          <div className="p-4 sm:p-5 pb-24 sm:pb-8">
 
             {/* Author */}
             <div className="flex items-center gap-3 mb-4">
@@ -189,7 +189,7 @@ export default function PostModal({ post, onClose }) {
               {post.is_edited && (
                 <>
                   <span>·</span>
-                  <span>Edited</span>
+                  <span>Diedit</span>
                 </>
               )}
             </div>
@@ -198,15 +198,15 @@ export default function PostModal({ post, onClose }) {
             <div className="flex items-center gap-4 py-2.5 border-b border-border-subtle text-xs">
               <div className="flex items-center gap-1">
                 <span className="font-bold text-text-primary tabular-nums">{formatCount(post.upvote_count || 0)}</span>
-                <span className="text-text-dim">Upvotes</span>
+                <span className="text-text-dim">Upvote</span>
               </div>
               <div className="flex items-center gap-1">
                 <span className="font-bold text-text-primary tabular-nums">{formatCount(post.downvote_count || 0)}</span>
-                <span className="text-text-dim">Downvotes</span>
+                <span className="text-text-dim">Downvote</span>
               </div>
               <div className="flex items-center gap-1">
                 <span className="font-bold text-text-primary tabular-nums">{formatCount(post.comment_count || 0)}</span>
-                <span className="text-text-dim">Comments</span>
+                <span className="text-text-dim">Komentar</span>
               </div>
             </div>
 
@@ -226,7 +226,7 @@ export default function PostModal({ post, onClose }) {
                   transition-all duration-200 text-xs font-medium cursor-pointer"
               >
                 <HiChatBubbleOvalLeft className="w-4 h-4" />
-                <span className="hidden sm:inline">Comment</span>
+                <span className="hidden sm:inline">Komen</span>
               </button>
               <button
                 onClick={handleShare}

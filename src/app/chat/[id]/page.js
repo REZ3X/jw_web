@@ -15,6 +15,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
@@ -25,6 +26,7 @@ import {
 import { ImSpinner8 } from "react-icons/im";
 import { motion, AnimatePresence } from "framer-motion";
 import Avatar from "@/components/ui/Avatar";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 import { useAuthStore } from "@/lib/store";
 import { clientFetch } from "@/lib/api";
 import { timeAgo, cn } from "@/lib/utils";
@@ -46,6 +48,9 @@ export default function ChatConversation() {
   const [loading, setLoading] = useState(true);
   const [sidebarLoading, setSidebarLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [chatToDelete, setChatToDelete] = useState(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Load chat + messages
   useEffect(() => {
@@ -58,7 +63,7 @@ export default function ChatConversation() {
         setChat(chatRes.data);
         setMessages(msgRes.data || []);
       })
-      .catch(() => toast.error("Failed to load chat"))
+      .catch(() => toast.error("Gagal memuat obrolan"))
       .finally(() => setLoading(false));
   }, [id, user]);
 
@@ -133,11 +138,16 @@ export default function ChatConversation() {
       // Refresh title if it was "New Chat"
       if (chat && chat.title === "New Chat") {
         clientFetch(`/api/chats/${id}`)
-          .then((r) => setChat(r.data))
+          .then((r) => {
+            setChat(r.data);
+            setChats((prev) =>
+              prev.map((c) => (c.id === id ? { ...c, title: r.data.title } : c))
+            );
+          })
           .catch(() => {});
       }
     } catch (err) {
-      toast.error(err.message || "Failed to send message");
+      toast.error(err.message || "Gagal ngirim pesan");
       setMessages((prev) => prev.filter((m) => m.id !== tempUserMsg.id));
     }
     setSending(false);
@@ -168,16 +178,25 @@ export default function ChatConversation() {
     }
   };
 
-  const deleteChat = async (chatId) => {
-    if (!confirm("Delete this conversation?")) return;
+  const handleDeleteClick = (id) => {
+    setChatToDelete(id);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDeleteChat = async () => {
+    if (!chatToDelete) return;
+    setIsDeleting(true);
     try {
-      await clientFetch(`/api/chats/${chatId}`, { method: "DELETE" });
-      setChats((prev) => prev.filter((c) => c.id !== chatId));
-      if (chatId === id) router.push("/chat");
-      toast.success("Chat deleted");
+      await clientFetch(`/api/chats/${chatToDelete}`, { method: "DELETE" });
+      setChats((prev) => prev.filter((c) => c.id !== chatToDelete));
+      if (chatToDelete === id) router.push("/chat");
+      toast.success("Chat dihapus");
     } catch (err) {
       toast.error(err.message);
     }
+    setIsDeleting(false);
+    setShowDeleteConfirm(false);
+    setChatToDelete(null);
   };
 
   if (!user) { router.push("/auth/login"); return null; }
@@ -204,7 +223,7 @@ export default function ChatConversation() {
             </div>
             <div className="min-w-0">
               <h1 className="text-sm font-semibold truncate text-text-primary">
-                {chat?.title || "Loading…"}
+                {chat?.title || "Loading..."}
               </h1>
             </div>
           </div>
@@ -212,8 +231,8 @@ export default function ChatConversation() {
           {/* Sidebar Toggle Button */}
           <button
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="hidden md:flex items-center justify-center p-1.5 rounded-lg text-text-muted hover:bg-bg-card-hover hover:text-text-primary transition-all"
-            title={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
+            className="hidden md:flex items-center justify-center p-1.5 rounded-lg text-text-muted hover:bg-bg-card-hover hover:text-text-primary transition-all cursor-pointer"
+            title={isSidebarOpen ? "Tutup sidebar" : "Buka sidebar"}
           >
             {isSidebarOpen ? <HiChevronRight className="w-5 h-5" /> : <HiChevronLeft className="w-5 h-5" />}
           </button>
@@ -225,17 +244,17 @@ export default function ChatConversation() {
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
                 <ImSpinner8 className="w-6 h-6 animate-spin text-text-dim mx-auto mb-3" />
-                <p className="text-sm text-text-dim">Loading conversation…</p>
+                <p className="text-sm text-text-dim">Loading obrolan...</p>
               </div>
             </div>
           ) : messages.length === 0 ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
-                <div className="w-12 h-12 rounded-2xl bg-jw-accent/10 border border-jw-accent/15 flex items-center justify-center mx-auto mb-4">
-                  <HiCpuChip className="w-6 h-6 text-jw-accent" />
+                <div className="flex justify-center mx-auto mb-4">
+                  <Avatar src="/assets/kirana.png" name="Kirana" size="lg" />
                 </div>
-                <p className="text-sm text-text-muted mb-1">Start the conversation</p>
-                <p className="text-xs text-text-dim">Type a message below to begin.</p>
+                <p className="text-sm text-text-muted mb-1">Mulai obrolan</p>
+                <p className="text-xs text-text-dim">Ketik pesan di bawah buat mulai ngobrol.</p>
               </div>
             </div>
           ) : (
@@ -256,12 +275,10 @@ export default function ChatConversation() {
                     {msg.role === "user" ? (
                       <Avatar src={user.avatar_url} name={user.name} size="xs" />
                     ) : (
-                      <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-jw-secondary to-jw-accent flex items-center justify-center shrink-0">
-                        <HiCpuChip className="w-3 h-3 text-white" />
-                      </div>
+                      <Avatar src="/assets/kirana.png" name="Kirana" size="xs" />
                     )}
                     <span className="text-xs font-semibold text-text-primary">
-                      {msg.role === "user" ? "You" : "JW AI"}
+                      {msg.role === "user" ? "You" : "Kirana"}
                     </span>
                   </div>
 
@@ -307,10 +324,8 @@ export default function ChatConversation() {
                     className="py-5"
                   >
                     <div className="flex items-center gap-2.5 mb-2">
-                      <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-jw-secondary to-jw-accent flex items-center justify-center shrink-0">
-                        <HiCpuChip className="w-3 h-3 text-white" />
-                      </div>
-                      <span className="text-xs font-semibold text-text-primary">JW AI</span>
+                      <Avatar src="/assets/kirana.png" name="Kirana" size="xs" />
+                      <span className="text-xs font-semibold text-text-primary">Kirana</span>
                     </div>
                     <div className="pl-[34px] flex items-center gap-2">
                       <div className="flex gap-1">
@@ -318,7 +333,7 @@ export default function ChatConversation() {
                         <div className="w-2 h-2 rounded-full bg-jw-accent/60 animate-bounce" style={{ animationDelay: "150ms" }} />
                         <div className="w-2 h-2 rounded-full bg-jw-accent/60 animate-bounce" style={{ animationDelay: "300ms" }} />
                       </div>
-                      <span className="text-xs text-text-dim">Thinking…</span>
+                      <span className="text-xs text-text-dim">Mikir...</span>
                     </div>
                   </motion.div>
                 )}
@@ -341,7 +356,7 @@ export default function ChatConversation() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Message JW AI…"
+                  placeholder="Kirim pesan ke Kirana..."
                   rows={1}
                   className="flex-1 bg-transparent border-none text-sm text-text-primary
                     placeholder:text-text-dim leading-relaxed py-1.5
@@ -367,7 +382,7 @@ export default function ChatConversation() {
                 </motion.button>
               </div>
               <p className="text-[10px] text-text-dim text-center mt-2">
-                JW AI can make mistakes. Verify important information.
+                Kirana bisa aja salah. Cek lagi info penting ya.
               </p>
             </form>
           </div>
@@ -392,7 +407,7 @@ export default function ChatConversation() {
                 transition-all duration-200 cursor-pointer"
             >
               <HiPlus className="w-4 h-4" />
-              New chat
+              Chat baru
             </button>
           </div>
 
@@ -426,7 +441,7 @@ export default function ChatConversation() {
                     )}>{c.title}</p>
                   </Link>
                   <button
-                    onClick={(e) => { e.stopPropagation(); deleteChat(c.id); }}
+                    onClick={(e) => { e.stopPropagation(); handleDeleteClick(c.id); }}
                     className="p-1.5 mr-1 rounded-md text-text-dim opacity-0 group-hover:opacity-100
                       hover:text-danger hover:bg-danger/8 transition-all cursor-pointer"
                   >
@@ -439,6 +454,19 @@ export default function ChatConversation() {
         </div>
       </motion.aside>
 
+      <ConfirmModal
+        open={showDeleteConfirm}
+        onClose={() => {
+          setShowDeleteConfirm(false);
+          setChatToDelete(null);
+        }}
+        onConfirm={confirmDeleteChat}
+        title="Hapus Chat"
+        description="Yakin mau hapus chat ini? Nggak bisa dikembaliin."
+        confirmText="Ya, Hapus"
+        danger
+        loading={isDeleting}
+      />
     </div>
   );
 }
