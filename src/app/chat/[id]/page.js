@@ -21,7 +21,7 @@ import remarkGfm from "remark-gfm";
 import {
   HiPaperAirplane, HiArrowLeft, HiCpuChip,
   HiWrenchScrewdriver, HiChatBubbleLeftRight,
-  HiPlus, HiTrash, HiStopCircle, HiChevronRight, HiChevronLeft
+  HiPlus, HiTrash, HiStopCircle, HiChevronRight, HiChevronLeft, HiPhoto
 } from "react-icons/hi2";
 import { ImSpinner8 } from "react-icons/im";
 import { motion, AnimatePresence } from "framer-motion";
@@ -51,6 +51,8 @@ export default function ChatConversation() {
   const [chatToDelete, setChatToDelete] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [selectedImages, setSelectedImages] = useState([]);
+  const fileInputRef = useRef(null);
 
   // Load chat + messages
   useEffect(() => {
@@ -105,26 +107,45 @@ export default function ChatConversation() {
 
   useEffect(() => { adjustTextarea(); }, [input, adjustTextarea]);
 
+  const handleImageSelect = (e) => {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        setSelectedImages(prev => [...prev, { file, dataUrl: ev.target.result }]);
+      };
+      reader.readAsDataURL(file);
+    });
+    e.target.value = "";
+  };
+
   /** Send a message */
   const sendMessage = async (text) => {
-    const msgText = (text || input).trim();
-    if (!msgText || sending) return;
+    const msgText = (text !== undefined ? text : input).trim();
+    if ((!msgText && selectedImages.length === 0) || sending) return;
 
     setInput("");
+    const imagesToSend = selectedImages.map(img => img.dataUrl);
+    setSelectedImages([]);
     setSending(true);
 
     const tempUserMsg = {
       id: `temp-${Date.now()}`,
       role: "user",
-      content: msgText,
+      content: msgText || "(Mengirim gambar)",
       created_at: new Date().toISOString(),
     };
     setMessages((prev) => [...prev, tempUserMsg]);
 
     try {
+      const payload = { message: msgText || "Ada gambar yang dilampirkan" };
+      if (imagesToSend.length > 0) {
+        payload.images = imagesToSend;
+      }
       const res = await clientFetch(`/api/chats/${id}/messages`, {
         method: "POST",
-        body: JSON.stringify({ message: msgText }),
+        body: JSON.stringify(payload),
       });
 
       const { user_message, assistant_message } = res.data;
@@ -348,9 +369,43 @@ export default function ChatConversation() {
         <div className="shrink-0 border-t border-border-subtle bg-bg-default/80 backdrop-blur-lg">
           <div className="max-w-3xl mx-auto px-4 py-3">
             <form onSubmit={handleSend} className="relative">
+              {/* Image Holding Grid */}
+              {selectedImages.length > 0 && (
+                <div className="mb-3 flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-border-default">
+                  {selectedImages.map((img, idx) => (
+                    <div key={idx} className="relative w-16 h-16 rounded-xl bg-bg-card border border-border-default shrink-0 overflow-hidden group">
+                      <Image src={img.dataUrl} alt="preview" fill className="object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => setSelectedImages(prev => prev.filter((_, i) => i !== idx))}
+                        className="absolute top-1 right-1 p-0.5 bg-black/60 text-white rounded-full opacity-0 group-hover:opacity-100 transition cursor-pointer"
+                      >
+                        <HiPlus className="w-3 h-3 rotate-45" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               <div className="flex items-end gap-2 bg-bg-card border border-border-default rounded-2xl
                 focus-within:border-jw-accent/40 focus-within:ring-2 focus-within:ring-jw-accent/15
                 transition-all duration-200 px-4 py-2">
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="p-1.5 text-text-dim hover:text-jw-accent hover:bg-bg-card-hover rounded-lg transition mb-0.5"
+                  title="Lampirkan Gambar"
+                >
+                  <HiPhoto className="w-5 h-5" />
+                </button>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  multiple
+                  accept="image/*"
+                  onChange={handleImageSelect}
+                />
                 <textarea
                   ref={textareaRef}
                   value={input}
@@ -366,10 +421,10 @@ export default function ChatConversation() {
                 <motion.button
                   whileTap={{ scale: 0.9 }}
                   type="submit"
-                  disabled={!input.trim() || sending}
+                  disabled={(!input.trim() && selectedImages.length === 0) || sending}
                   className={cn(
                     "p-2 rounded-xl transition-all duration-200 cursor-pointer shrink-0 mb-0.5",
-                    input.trim() && !sending
+                    (input.trim() || selectedImages.length > 0) && !sending
                       ? "gradient-btn shadow-md shadow-jw-accent/15"
                       : "bg-bg-inset text-text-dim"
                   )}
